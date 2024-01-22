@@ -1,7 +1,5 @@
 const trackName = document.querySelector(".track-name");
-const trackControlsBack = document.querySelector(".track-controls-back");
 const trackControlsPause = document.querySelector(".track-controls-pause");
-const trackControlsForward = document.querySelector(".track-controls-forward");
 const timeTexts = document.querySelector(".time-texts");
 const timeText1 = document.querySelector("#time-text-1");
 const timeText2 = document.querySelector("#time-text-2");
