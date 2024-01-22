@@ -1,5 +1,4 @@
 const trackName = document.querySelector(".track-name");
-const trackArtist = document.querySelector(".track-artist");
 const trackControlsBack = document.querySelector(".track-controls-back");
 const trackControlsPause = document.querySelector(".track-controls-pause");
 const trackControlsForward = document.querySelector(".track-controls-forward");
@@ -20,7 +19,7 @@ trackTimelineFront.addEventListener("input", (e) =>
 		}
 	})
 
-trackTimelineFront.addEventListener("mouseenter", (e) =>
+trackTimelineFront.addEventListener("mouseenter", () =>
 	{
 		if (!isMusicSourceNull())
 		{
@@ -29,7 +28,7 @@ trackTimelineFront.addEventListener("mouseenter", (e) =>
 		}
 	});
 
-trackTimelineFront.addEventListener("mouseleave", (e) =>
+trackTimelineFront.addEventListener("mouseleave", () =>
 	{
 		if (!isMusicSourceNull())
 		{
@@ -62,7 +61,7 @@ window.bridge.sendFilePath((event, filePath) =>
 	playSelectedFile(filePath);
 });
 
-musicPlayer.addEventListener('loadedmetadata', (e) =>
+musicPlayer.addEventListener('loadedmetadata', () =>
 	{
 		trackTimelineFront.max = Math.floor(musicPlayer.duration);
 		setTimelineValue();
