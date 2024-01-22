@@ -1,0 +1,73 @@
+{
+	"name": "Harmoonic",
+	"productName": "Harmoonic",
+	"version": "0.0.1",
+	"icon": "build/icon.png",
+	"description": "",
+	"main": "main.js",
+	"scripts": {
+		"start": "electron .",
+		"pack": "electron-builder --win",
+		"build": "electron-builder"
+	},
+	"author": "EVERMEDIA PROJECT",
+	"copyright": "Copyright © 2023 ${author}",
+	"license": "MIT",
+	"devDependencies": {
+		"electron": "^28.1.4",
+		"electron-builder": "^24.9.1"
+	},
+	"build": {
+		"appId": "com.EVERMEDIAPROJECT.Harmoonic",
+		"mac": {
+			"category": "Music Player"
+		},
+		"fileAssociations": [
+			{
+				"ext": "mp3"
+			},
+			{
+				"ext": "wav"
+			},
+			{
+				"ext": "weba"
+			},
+			{
+				"ext": "webm"
+			},
+			{
+				"ext": "m4a"
+			},
+			{
+				"ext": "ogg"
+			},
+			{
+				"ext": "oga"
+			},
+			{
+				"ext": "caf"
+			},
+			{
+				"ext": "flac"
+			},
+			{
+				"ext": "opus"
+			},
+			{
+				"ext": "mid"
+			},
+			{
+				"ext": "aiff"
+			},
+			{
+				"ext": "wma"
+			},
+			{
+				"ext": "au"
+			}
+		],
+		"nsis": {
+			"perMachine": false
+		}
+	}
+}
