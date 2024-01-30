@@ -71,6 +71,7 @@ musicPlayer.addEventListener('loadedmetadata', () =>
 function playSelectedFile(filePath)
 {
 	musicPlayer.src = filePath;
+	play();
 	setTrackNameText(filePath);
 
 	setInterval(() =>
@@ -80,10 +81,7 @@ function playSelectedFile(filePath)
 			setTimelineValue();
 			setTimeText1();
 		}
-		else pause(true);
 	}, 100);
-
-	trackControlsPause.children[0].src = "images/pause.png";
 }
 
 function playPause()
@@ -116,6 +114,7 @@ function skipBack()
 	{
 		musicPlayer.currentTime = 0;
 		setTimelineValue();
+		setTimeText1();
 	}
 }
 
@@ -125,6 +124,7 @@ function skipForward()
 	{
 		musicPlayer.currentTime = musicPlayer.duration;
 		setTimelineValue();
+		setTimeText1();
 		pause(true);
 	}
 }
@@ -136,7 +136,6 @@ function isMusicSourceNull()
 
 function setTrackNameText(filePath)
 {
-	console.log(filePath);
 	pathSep = '';
 	if (filePath.includes('\\')) pathSep = '\\';
 	if (filePath.includes('/')) pathSep = '/';

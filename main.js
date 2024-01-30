@@ -6,9 +6,6 @@ var additionalDataFilePath = "";
 if (process.argv.length >= 2)
 	additionalDataFilePath = process.argv[1];
 
-/* if (process.platform === 'linux')
-	additionalDataFilePath = additionalDataFilePath.replaceAll("\\", "/"); */
-
 const isSingleInstance = app.requestSingleInstanceLock(additionalDataFilePath);
 
 //runs on second instance
@@ -48,7 +45,6 @@ function createMainWindow()
 			height: isDev ? 700 : 200,
 			center: false,
 			titleBarStyle: 'hidden',
-			/* titleBarOverlay: true, */
 			titleBarOverlay:
 			{
 				color: '#0000',
@@ -88,7 +84,6 @@ function createMainWindow()
 			height: isDev ? 700 : 200,
 			center: false,
 			titleBarStyle: 'hidden',
-			/* titleBarOverlay: true, */
 			titleBarOverlay:
 			{
 				color: '#0000',
@@ -114,8 +109,6 @@ function createMainWindow()
 
 	if (process.argv.length >= 2)
 		filePath = process.argv[1];
-
-	/* filePath = filePath.replaceAll("\\", "/"); */
 
 	mainWindow.loadFile(path.join(__dirname, './renderer/index.html')).then(() =>
 		{
