@@ -145,10 +145,11 @@ function setTrackNameText(filePath)
 
 function setTimeText1()
 {
-	var hours = String(Math.floor(musicPlayer.currentTime / 60 / 60));
-	var minutes = String(Math.floor(musicPlayer.currentTime / 60));
-	var seconds = String(Math.floor(musicPlayer.currentTime % 60));
+	var hours = String(Math.floor(musicPlayer.currentTime / 3600));
+	var minutes = String(Math.floor(musicPlayer.currentTime % 3600 / 60));
+	var seconds = String(Math.floor(musicPlayer.currentTime % 3600 % 60));
 
+	if (minutes.length < 2) minutes = '0' + minutes;
 	if (seconds.length < 2) seconds = '0' + seconds;
 
 	if (musicPlayer.currentTime / 60 < 60) timeText1.textContent = minutes + ":" + seconds;
@@ -157,10 +158,11 @@ function setTimeText1()
 
 function setTimeText2()
 {
-	var hours = String(Math.floor(musicPlayer.duration / 60 / 60));
-	var minutes = String(Math.floor(musicPlayer.duration / 60));
-	var seconds = String(Math.floor(musicPlayer.duration % 60));
+	var hours = String(Math.floor(musicPlayer.duration / 3600));
+	var minutes = String(Math.floor(musicPlayer.duration % 3600 / 60));
+	var seconds = String(Math.floor(musicPlayer.duration % 3600 % 60));
 
+	if (minutes.length < 2) minutes = '0' + minutes;
 	if (seconds.length < 2) seconds = '0' + seconds;
 
 	if (musicPlayer.duration / 60 < 60) timeText2.textContent = minutes + ":" + seconds;

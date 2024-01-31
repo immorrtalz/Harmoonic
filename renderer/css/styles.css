@@ -86,8 +86,7 @@ body
 .track-texts
 {
 	width: 100%;
-	height: fit-content;
-	max-height: 64px;
+	height: 4rem;
 	margin: 0;
 	padding: 0;
 	display: flex;
@@ -102,9 +101,8 @@ body
 	margin: 0.5rem 0;
 	font-size: 1.1rem;
 	font-weight: 800;
-	height: 4rem;
-	overflow: clip;
-	background: linear-gradient(to bottom, white 2rem, transparent);
+	height: 100%;
+	background: linear-gradient(to bottom, white 2.5rem, transparent);
 	background-clip: text;
 	-webkit-background-clip: text;
 	color: transparent;
@@ -112,7 +110,6 @@ body
 
 .track-name:hover
 {
-	overflow: visible;
 	background: linear-gradient(white, white);
 	background-clip: text;
 	-webkit-background-clip: text;

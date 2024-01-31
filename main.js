@@ -1,10 +1,13 @@
 const path = require('path');
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, screen } = require('electron');
 
 var additionalDataFilePath = "";
 
 if (process.argv.length >= 2)
 	additionalDataFilePath = process.argv[1];
+
+if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " ")
+	app.exit(0);
 
 const isSingleInstance = app.requestSingleInstanceLock(additionalDataFilePath);
 
@@ -28,12 +31,15 @@ var mainWindow;
 process.env.NODE_ENV = 'production';
 
 const isDev = process.env.NODE_ENV !== 'production';
-const isMac = process.platform === 'darwin';
-const useTransparentDesign = false;
+const isMac = process.platform === 'darwin'; //technically the app can be ran on MacOS, but officially it's NOT supported for now. You CAN try to use the app on MacOS if you want
+const useTransparentDesign = false; //idk if this will be implemented cuz there are some Electron issues with Windows' transparent materials
 
 //create the main window
 function createMainWindow()
 {
+	const screenWidth = screen.getPrimaryDisplay().workAreaSize.width;
+	const screenHeight = screen.getPrimaryDisplay().workAreaSize.height;
+
 	if (useTransparentDesign)
 	{
 		mainWindow = new BrowserWindow(
@@ -75,13 +81,16 @@ function createMainWindow()
 	}
 	else //normal design
 	{
+		var windowWidth = isDev ? 1000 : 400;
+		var windowHeight = isDev ? 700 : 200;
+
 		mainWindow = new BrowserWindow(
 		{
 			title: 'Harmoonic',
-			x: 8,
-			y: 8,
-			width: isDev ? 1000 : 400,
-			height: isDev ? 700 : 200,
+			x: (screenWidth - windowWidth) / 2,
+			y: screenHeight - windowHeight - 16,
+			width: windowWidth,
+			height: windowHeight,
 			center: false,
 			titleBarStyle: 'hidden',
 			titleBarOverlay:
