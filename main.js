@@ -45,7 +45,7 @@ function createMainWindow()
 	var windowWidth = isDev ? 1000 : 400;
 	var windowHeight = isDev ? 700 : 200;
 
-	if (useTransparentDesign)
+	if (useTransparentDesign) //ADD WIN VER CHECK cuz backgroundMaterial doesn't work everywhere
 	{
 		mainWindow = new BrowserWindow(
 		{
@@ -66,11 +66,10 @@ function createMainWindow()
 			fullscreenable: false,
 			resizable: false,
 			backgroundColor: '#0000',
-			backgroundMaterial: 'mica',
-			transparent: true,
+			backgroundMaterial: 'acrylic',
+			/* transparent: true,
 			thickFrame: false,
-			//opacity: 0.75,
-			frame: false,
+			frame: false, */
 			webPreferences:
 			{
 				nodeIntegration: true,
@@ -78,10 +77,6 @@ function createMainWindow()
 				preload: path.join(__dirname, './preload.js')
 			}
 		});
-
-		const [w, h] = mainWindow.getSize();
-		mainWindow.setSize(w + 1, h);
-		mainWindow.setSize(w, h);
 	}
 	else //normal design
 	{
