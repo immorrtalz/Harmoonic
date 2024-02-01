@@ -1,1 +1,1 @@
-npm run build
+npm run update-all && npm run build

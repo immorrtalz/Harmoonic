@@ -1,28 +1,36 @@
 {
 	"name": "Harmoonic",
 	"productName": "Harmoonic",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"icon": "build/icon.png",
-	"description": "",
+	"description": "Simple audio player with modern design",
 	"main": "main.js",
-	"scripts": {
+	"scripts":
+	{
 		"start": "electron .",
 		"pack": "electron-builder --win",
-		"build": "electron-builder"
+		"build": "electron-builder",
+		"update-all": "npm install --save"
 	},
 	"author": "EVERMEDIA PROJECT",
-	"copyright": "Copyright © 2023 ${author}",
-	"license": "MIT",
-	"devDependencies": {
+	"copyright": "Copyright © 2024 ${author}",
+	"license": "GPL-3.0",
+	"homepage": "https://github.com/immorrtalz/Harmoonic",
+	"repository": "github:immorrtalz/Harmoonic",
+	"bugs":
+	{
+		"url": "https://github.com/immorrtalz/Harmoonic/issues"
+	},
+	"devDependencies":
+	{
 		"electron": "^28.1.4",
 		"electron-builder": "^24.9.1"
 	},
-	"build": {
+	"build":
+	{
 		"appId": "com.EVERMEDIAPROJECT.Harmoonic",
-		"mac": {
-			"category": "Music Player"
-		},
-		"fileAssociations": [
+		"fileAssociations":
+		[
 			{
 				"ext": "mp3"
 			},
@@ -65,9 +73,16 @@
 			{
 				"ext": "au"
 			}
-		],
-		"nsis": {
-			"perMachine": false
-		}
+		]
+	},
+	"target": "nsis",
+	"win":
+	{
+		"perMachine": false,
+		"deleteAppDataOnUninstall": true,
+		"oneClick": false,
+		"multiLanguageInstaller": false,
+		"installerIcon": "build/icon.png",
+		"installerHeaderIcon": "build/icon.png"
 	}
 }

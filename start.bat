@@ -1,1 +1,1 @@
-npm start
+npm run update-all && npm start

@@ -9,6 +9,8 @@ if (process.argv.length >= 2)
 if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " ")
 	app.exit(0);
 
+//TODO: exit if file extension/format isn't supported
+
 const isSingleInstance = app.requestSingleInstanceLock(additionalDataFilePath);
 
 //runs on second instance
@@ -144,6 +146,11 @@ app.whenReady().then(() =>
 			if (BrowserWindow.getAllWindows().length === 0)
 				createMainWindow();
 		});
+
+		/* for (var i = 0; i < process.argv.length; i++)
+		{
+			console.log(process.argv[i]); //TODO: tracks queue
+		} */
 	}
 });
 

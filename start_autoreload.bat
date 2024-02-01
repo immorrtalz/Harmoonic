@@ -1,1 +1,1 @@
-npx electronmon .
+npm run update-all && npx electronmon .

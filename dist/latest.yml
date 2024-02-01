@@ -1,8 +1,8 @@
-version: 0.0.1
+version: 0.1.0
 files:
-  - url: Harmoonic-Setup-0.0.1.exe
-    sha512: ypJsNf9Z2tdaH5P6ZyUM9r479yho1wO9unuLZl4EijVrGnsYE4T4ryV0y0c58pBUZBWdpw7IWu3GiZ33JKylsQ==
-    size: 82289029
-path: Harmoonic-Setup-0.0.1.exe
-sha512: ypJsNf9Z2tdaH5P6ZyUM9r479yho1wO9unuLZl4EijVrGnsYE4T4ryV0y0c58pBUZBWdpw7IWu3GiZ33JKylsQ==
-releaseDate: '2024-01-31T16:33:53.528Z'
+  - url: Harmoonic-Setup-0.1.0.exe
+    sha512: FQDAcUZXptrLMcIBN++PqhStweZFJwNSTSOiDMLVh5cu5wdNZ2gBHrxEngTVdWWfS3lRSBQQH+mQZlXWCPfe0A==
+    size: 82329546
+path: Harmoonic-Setup-0.1.0.exe
+sha512: FQDAcUZXptrLMcIBN++PqhStweZFJwNSTSOiDMLVh5cu5wdNZ2gBHrxEngTVdWWfS3lRSBQQH+mQZlXWCPfe0A==
+releaseDate: '2024-02-01T14:03:34.643Z'

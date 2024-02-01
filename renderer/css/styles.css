@@ -3,7 +3,6 @@
 	--clr-background: #101015;
 	/* --clr-accent: #0094FF; */
 	--clr-accent: #cb61fc;
-	--clr-accent-transparent: #065FA1;
 	--clr-white-transparent-20: #ffffff32;
 	--clr-white-transparent-40: #ffffff64;
 }
@@ -54,7 +53,7 @@ body
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background: linear-gradient(to top, var(--clr-accent-transparent), var(--clr-background));
+	background: linear-gradient(to top, var(--clr-accent), var(--clr-background));
 	border-radius: 7px;
 }
 
@@ -64,11 +63,6 @@ body
 	height: 100%;
 	margin: 0;
 	padding: 2rem 1rem 1rem 1rem;
-	/*display: flex;
-	flex-direction: column;
-	flex-wrap: nowrap;
-	align-items: center;
-	justify-content: space-between;*/
 }
 
 .draggable-zone

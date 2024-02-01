@@ -2,8 +2,6 @@ directories:
   output: dist
   buildResources: build
 appId: com.EVERMEDIAPROJECT.Harmoonic
-mac:
-  category: Music Player
 fileAssociations:
   - ext: mp3
   - ext: wav
@@ -19,7 +17,5 @@ fileAssociations:
   - ext: aiff
   - ext: wma
   - ext: au
-nsis:
-  perMachine: false
 files: []
 electronVersion: 28.1.4
