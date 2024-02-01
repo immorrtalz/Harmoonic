@@ -6,8 +6,8 @@ var additionalDataFilePath = "";
 if (process.argv.length >= 2)
 	additionalDataFilePath = process.argv[1];
 
-if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " ")
-	app.exit(0);
+/* if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " ")
+	app.exit(0); */
 
 //TODO: exit if file extension/format isn't supported
 
@@ -34,7 +34,7 @@ process.env.NODE_ENV = 'production';
 
 const isDev = process.env.NODE_ENV !== 'production';
 const isMac = process.platform === 'darwin'; //technically the app can be ran on MacOS, but officially it's NOT supported for now. You CAN try to use the app on MacOS if you want
-const useTransparentDesign = false; //idk if this will be implemented cuz there are some Electron issues with Windows' transparent materials
+const useTransparentDesign = true; //idk if this will be implemented cuz there are some Electron issues with Windows' transparent materials
 
 //create the main window
 function createMainWindow()
@@ -42,15 +42,18 @@ function createMainWindow()
 	const screenWidth = screen.getPrimaryDisplay().workAreaSize.width;
 	const screenHeight = screen.getPrimaryDisplay().workAreaSize.height;
 
+	var windowWidth = isDev ? 1000 : 400;
+	var windowHeight = isDev ? 700 : 200;
+
 	if (useTransparentDesign)
 	{
 		mainWindow = new BrowserWindow(
 		{
 			title: 'Harmoonic',
-			x: 8,
-			y: 8,
-			width: isDev ? 1000 : 400,
-			height: isDev ? 700 : 200,
+			x: (screenWidth - windowWidth) / 2,
+			y: screenHeight - windowHeight - 16,
+			width: windowWidth,
+			height: windowHeight,
 			center: false,
 			titleBarStyle: 'hidden',
 			titleBarOverlay:
@@ -63,7 +66,7 @@ function createMainWindow()
 			fullscreenable: false,
 			resizable: false,
 			backgroundColor: '#0000',
-			backgroundMaterial: 'acrylic',
+			backgroundMaterial: 'mica',
 			transparent: true,
 			thickFrame: false,
 			//opacity: 0.75,
@@ -79,13 +82,9 @@ function createMainWindow()
 		const [w, h] = mainWindow.getSize();
 		mainWindow.setSize(w + 1, h);
 		mainWindow.setSize(w, h);
-		mainWindow.setContentProtection(true);
 	}
 	else //normal design
 	{
-		var windowWidth = isDev ? 1000 : 400;
-		var windowHeight = isDev ? 700 : 200;
-
 		mainWindow = new BrowserWindow(
 		{
 			title: 'Harmoonic',

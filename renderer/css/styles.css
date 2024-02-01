@@ -35,13 +35,18 @@ img
 	pointer-events: none;
 }
 
+html
+{
+	background: #0000;
+}
+
 body
 {
 	width: 400px;
 	height: 200px;
 	margin: 0;
 	padding: 0;
-	background: var(--clr-background);
+	background: #0000;
 	/*border: 1px solid #ffffff40;*/
 	border-radius: 8px;
 }
@@ -53,7 +58,7 @@ body
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background: linear-gradient(to top, var(--clr-accent), var(--clr-background));
+	background: #0000;/* linear-gradient(to top, var(--clr-accent), transparent); */
 	border-radius: 7px;
 }
 
