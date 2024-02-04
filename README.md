@@ -11,12 +11,10 @@ Simple audio player with modern design
 
 ---
 
-Open source, executables are Windows only, but technically the app can be built for MacOS and Linux
+Open source and Windows only, but technically can be built for MacOS and Linux
 
 > [!CAUTION]
-> [Windows Defender issue](https://github.com/immorrtalz/Harmoonic/issues/9)
+> **[Windows Defender issue](https://github.com/immorrtalz/Harmoonic/issues/9)**
 
-> [!IMPORTANT]
-> All build files are in `Harmoonic\dist`.
-> Windows installer is `Harmoonic\dist\Harmoonic Setup x.x.x.exe` and it doesn't need any other files.
-> Windows portable version is in `Harmoonic\dist\win-unpacked`. The whole folder is an app and it doesn't need any other files
+> [!TIP]
+> **Download the latest release: https://github.com/immorrtalz/Harmoonic/releases/latest**
