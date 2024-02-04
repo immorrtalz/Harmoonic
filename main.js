@@ -6,12 +6,12 @@ var additionalDataFilePath = "";
 if (process.argv.length >= 2)
 	additionalDataFilePath = process.argv[1];
 
-if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " " || !isExtensionSupported())
+if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " ")
 	app.exit(0);
 
-function isExtensionSupported()
+/* function isExtensionSupported()
 {
-	const currentExt = additionalDataFilePath.split('.').slice(-1).toLowerCase();
+	const currentExt = additionalDataFilePath.split('.').slice(-1).toString().toLowerCase();
 	const exts = [ "mp3", "wav", "weba", "webm", "m4a", "ogg", "oga", "caf", "flac", "opus", "mid", "aiff", "wma", "au" ];
 
 	isOK = false;
@@ -26,7 +26,7 @@ function isExtensionSupported()
 	}
 
 	return isOK;
-}
+} */
 
 const isSingleInstance = app.requestSingleInstanceLock(additionalDataFilePath);
 
