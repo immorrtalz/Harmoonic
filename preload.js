@@ -7,6 +7,10 @@ contextBridge.exposeInMainWorld(
 		sendFilePath: (message) =>
 		{
 			ipcRenderer.on('sendFilePath', message);
+		},
+		windowFocused: (data) =>
+		{
+			ipcRenderer.on('windowFocused', data);
 		}
 	}
 );

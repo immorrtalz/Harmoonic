@@ -59,6 +59,11 @@ window.bridge.sendFilePath((event, filePath) =>
 	playSelectedFile(filePath);
 });
 
+window.bridge.windowFocused((event, isFocused) =>
+{
+	//document.body.style.background = isFocused ? "#0000" : "var(--clr-background)";
+});
+
 musicPlayer.addEventListener('loadedmetadata', () =>
 	{
 		trackTimelineFront.max = Math.floor(musicPlayer.duration);

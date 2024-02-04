@@ -6,8 +6,8 @@ var additionalDataFilePath = "";
 if (process.argv.length >= 2)
 	additionalDataFilePath = process.argv[1];
 
-if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " ")
-	app.exit(0);
+/* if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " ")
+	app.exit(0); */
 
 //TODO: exit if file extension/format isn't supported
 
@@ -33,84 +33,55 @@ var mainWindow;
 process.env.NODE_ENV = 'production';
 
 const isDev = process.env.NODE_ENV !== 'production';
-const isMac = process.platform === 'darwin'; //technically the app can be ran on MacOS, but officially it's NOT supported for now. You CAN try to use the app on MacOS if you want
-const useTransparentDesign = false; //idk if this will be implemented cuz there are some Electron issues with Windows' transparent materials
+const isWin = process.platform === 'win32';
+const isMac = process.platform === 'darwin'; //technically the app can be built for MacOS and Linux, but they're NOT supported by me
+
+var useTransparentDesign = false;
+
+if (isWin)
+{
+	const sysVer = require('os').release().split('.');
+	useTransparentDesign = sysVer.slice(-1) > 22621;
+}
 
 //create the main window
 function createMainWindow()
 {
-	const screenWidth = screen.getPrimaryDisplay().workAreaSize.width;
-	const screenHeight = screen.getPrimaryDisplay().workAreaSize.height;
+	const windowWidth = isDev ? 1000 : 400;
+	const windowHeight = isDev ? 700 : 200;
+
+	mainWindow = new BrowserWindow(
+	{
+		title: 'Harmoonic',
+		x: (screen.getPrimaryDisplay().workAreaSize.width - windowWidth) / 2,
+		y: screen.getPrimaryDisplay().workAreaSize.height - windowHeight - 16,
+		width: windowWidth,
+		height: windowHeight,
+		center: false,
+		titleBarStyle: 'hidden',
+		titleBarOverlay:
+		{
+			color: '#0000',
+			symbolColor: '#ffffff64',
+			height: 20,
+		},
+		backgroundColor: '#0000',
+		backgroundMaterial: 'acrylic',//if using a function below, the window glitches
+		maximizable: false,
+		fullscreenable: false,
+		resizable: false,
+		webPreferences:
+		{
+			nodeIntegration: true,
+			contextIsolation: true,
+			preload: path.join(__dirname, './preload.js')
+		}
+	});
 
 	if (useTransparentDesign)
 	{
-		mainWindow = new BrowserWindow(
-		{
-			title: 'Harmoonic',
-			x: 8,
-			y: 8,
-			width: isDev ? 1000 : 400,
-			height: isDev ? 700 : 200,
-			center: false,
-			titleBarStyle: 'hidden',
-			titleBarOverlay:
-			{
-				color: '#0000',
-				symbolColor: '#ffffff64',
-				height: 20,
-			},
-			maximizable: false,
-			fullscreenable: false,
-			resizable: false,
-			backgroundColor: '#0000',
-			backgroundMaterial: 'acrylic',
-			transparent: true,
-			thickFrame: false,
-			//opacity: 0.75,
-			frame: false,
-			webPreferences:
-			{
-				nodeIntegration: true,
-				contextIsolation: true,
-				preload: path.join(__dirname, './preload.js')
-			}
-		});
-
-		const [w, h] = mainWindow.getSize();
-		mainWindow.setSize(w + 1, h);
-		mainWindow.setSize(w, h);
-		mainWindow.setContentProtection(true);
-	}
-	else //normal design
-	{
-		var windowWidth = isDev ? 1000 : 400;
-		var windowHeight = isDev ? 700 : 200;
-
-		mainWindow = new BrowserWindow(
-		{
-			title: 'Harmoonic',
-			x: (screenWidth - windowWidth) / 2,
-			y: screenHeight - windowHeight - 16,
-			width: windowWidth,
-			height: windowHeight,
-			center: false,
-			titleBarStyle: 'hidden',
-			titleBarOverlay:
-			{
-				color: '#0000',
-				symbolColor: '#ffffff64',
-				height: 20,
-			},
-			maximizable: false,
-			fullscreenable: false,
-			resizable: false,
-			webPreferences:
-			{
-				nodeIntegration: true,
-				contextIsolation: true,
-				preload: path.join(__dirname, './preload.js')
-			}
-		});
+		//mainWindow.setBackgroundColor('#0000');
+		//mainWindow.setBackgroundMaterial('acrylic');
 	}
 
 	//open devtools if in dev env
@@ -130,7 +101,6 @@ function createMainWindow()
 		});
 }
 
-//app is ready
 app.whenReady().then(() =>
 {
 	if (!mainWindow)
@@ -154,7 +124,17 @@ app.whenReady().then(() =>
 	}
 });
 
-//menu template
+app.on('browser-window-blur', () =>
+{
+	if (useTransparentDesign) mainWindow.webContents.send('windowFocused', false);
+});
+
+app.on('browser-window-focus', () =>
+{
+	if (useTransparentDesign) mainWindow.webContents.send('windowFocused', true);
+});
+
+//menu template (the app doesn't have menu by a concept)
 const menu = [];
 
 app.on('window-all-closed', () =>
@@ -162,6 +142,7 @@ app.on('window-all-closed', () =>
 	if (!isMac) app.quit();
 });
 
+//add errors catcher to prevent the app from crashing
 /*app.on('render-process-gone', (event, details) =>
 {
 	app.exit();

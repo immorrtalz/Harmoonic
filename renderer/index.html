@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self'"> -->
 	<!-- <title>Harmoonic</title> -->
-	<link href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,500,600,700,800,900" rel="stylesheet">
+	<!-- <link href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,500,600,700,800,900" rel="stylesheet"> -->
 	<link rel="stylesheet" type="text/css" href="./css/styles.css">
 </head>
 
@@ -17,17 +17,15 @@
 
 		<div class="draggable-zone"></div>
 
-		<div class="track-texts">
-			<h1 class="track-name">Track Name</h1>
-		</div>
+		<h1 class="track-name"></h1>
 
 		<audio id="music" preload="metadata" autoplay="autoplay"></audio>
 		<input id="music-select" type="file" accept="audio/*"/>
 
 		<div class="track-controls">
-			<button class="track-controls-button track-controls-skip-back" onclick="skipBack()"><img src="images/skipback.png"></button>
-			<button class="track-controls-button track-controls-pause" onclick="playPause()"><img src="images/play.png"></button>
-			<button class="track-controls-button track-controls-skip-forward" onclick="skipForward()"><img src="images/skipforward.png"></button>
+			<button class="track-controls-button track-controls-skip-back" onclick="skipBack()"><img src="./images/skipback.png"></button>
+			<button class="track-controls-button track-controls-pause" onclick="playPause()"><img src="./images/play.png"></button>
+			<button class="track-controls-button track-controls-skip-forward" onclick="skipForward()"><img src="./images/skipforward.png"></button>
 		</div>
 
 		<div class="track-timeline">
