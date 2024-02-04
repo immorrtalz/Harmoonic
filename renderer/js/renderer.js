@@ -52,8 +52,6 @@ function remap(value, low1, high1, low2, high2)
 	return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
 }
 
-//inputNode.addEventListener('change', playSelectedFile, false);
-
 window.bridge.sendFilePath((event, filePath) =>
 {
 	playSelectedFile(filePath);
@@ -61,7 +59,9 @@ window.bridge.sendFilePath((event, filePath) =>
 
 window.bridge.windowFocused((event, isFocused) =>
 {
-	//document.body.style.background = isFocused ? "#0000" : "var(--clr-background)";
+	document.querySelector('.main-gradient').style.opacity = isFocused ? 0.5 : 0.85;
+	const temp = isFocused ? "transparent);" : "var(--clr-background));";
+	document.querySelector('.main-gradient').style.background = "linear-gradient(to top, var(--clr-accent), " + temp;
 });
 
 musicPlayer.addEventListener('loadedmetadata', () =>

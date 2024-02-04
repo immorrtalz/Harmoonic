@@ -1,7 +1,7 @@
 {
 	"name": "Harmoonic",
 	"productName": "Harmoonic",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"icon": "build/icon.png",
 	"description": "Simple audio player with modern design",
 	"main": "main.js",

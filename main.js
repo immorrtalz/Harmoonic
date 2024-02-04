@@ -6,10 +6,27 @@ var additionalDataFilePath = "";
 if (process.argv.length >= 2)
 	additionalDataFilePath = process.argv[1];
 
-/* if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " ")
-	app.exit(0); */
+if (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " " || !isExtensionSupported())
+	app.exit(0);
 
-//TODO: exit if file extension/format isn't supported
+function isExtensionSupported()
+{
+	const currentExt = additionalDataFilePath.split('.').slice(-1).toLowerCase();
+	const exts = [ "mp3", "wav", "weba", "webm", "m4a", "ogg", "oga", "caf", "flac", "opus", "mid", "aiff", "wma", "au" ];
+
+	isOK = false;
+
+	for (var i; i < exts.length; i++)
+	{
+		if (currentExt == exts)
+		{
+			isOK = true;
+			break;
+		}
+	}
+
+	return isOK;
+}
 
 const isSingleInstance = app.requestSingleInstanceLock(additionalDataFilePath);
 
@@ -34,7 +51,7 @@ process.env.NODE_ENV = 'production';
 
 const isDev = process.env.NODE_ENV !== 'production';
 const isWin = process.platform === 'win32';
-const isMac = process.platform === 'darwin'; //technically the app can be built for MacOS and Linux, but they're NOT supported by me
+const isMac = process.platform === 'darwin';
 
 var useTransparentDesign = false;
 
@@ -65,8 +82,8 @@ function createMainWindow()
 			symbolColor: '#ffffff64',
 			height: 20,
 		},
-		backgroundColor: '#0000',
-		backgroundMaterial: 'acrylic',//if using a function below, the window glitches
+		backgroundColor: useTransparentDesign ? '#0000' : '#101015',
+		backgroundMaterial: useTransparentDesign ? 'acrylic' : 'none',
 		maximizable: false,
 		fullscreenable: false,
 		resizable: false,
@@ -77,12 +94,6 @@ function createMainWindow()
 			preload: path.join(__dirname, './preload.js')
 		}
 	});
-
-	if (useTransparentDesign)
-	{
-		//mainWindow.setBackgroundColor('#0000');
-		//mainWindow.setBackgroundMaterial('acrylic');
-	}
 
 	//open devtools if in dev env
 	if (isDev) mainWindow.webContents.openDevTools();
@@ -134,7 +145,6 @@ app.on('browser-window-focus', () =>
 	if (useTransparentDesign) mainWindow.webContents.send('windowFocused', true);
 });
 
-//menu template (the app doesn't have menu by a concept)
 const menu = [];
 
 app.on('window-all-closed', () =>
@@ -142,13 +152,12 @@ app.on('window-all-closed', () =>
 	if (!isMac) app.quit();
 });
 
-//add errors catcher to prevent the app from crashing
-/*app.on('render-process-gone', (event, details) =>
-{
-	app.exit();
-}
-
 process.on('uncaughtException', (error) =>
 {
-	// Handle the error
-}*/
+	console.log(error);
+});
+
+app.on('render-process-gone', (event, details) =>
+{
+	app.exit(0);
+});
