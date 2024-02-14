@@ -18,3 +18,6 @@ Open source and Windows only, but technically can be built for MacOS and Linux
 
 > [!TIP]
 > **Download the latest release: https://github.com/immorrtalz/Harmoonic/releases/latest**
+
+> [!IMPORTANT]
+> **The application will probably be rebuilt in Tauri or Flutter to optimize app speed and executable file size**
