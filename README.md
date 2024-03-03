@@ -21,3 +21,5 @@ Open source and Windows only, but technically can be built for MacOS and Linux
 
 > [!IMPORTANT]
 > **The application will probably be rebuilt in Tauri or Flutter to optimize app speed and executable file size**
+
+![harmoonic-screenshot](https://github.com/immorrtalz/Harmoonic/assets/61843974/70816ba7-7c53-43cc-80f8-f767703748de)
