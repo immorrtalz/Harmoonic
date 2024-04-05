@@ -1,2 +1,2 @@
-import * as debug from 'debug';
+import debug from 'debug';
 export declare const d: debug.Debugger;

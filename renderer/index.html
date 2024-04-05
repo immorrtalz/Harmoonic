@@ -13,9 +13,11 @@
 <body>
 	<span class="main-gradient"></span>
 
-	<div class="content-container">
+	<div class="draggable-zone"></div>
 
-		<div class="draggable-zone"></div>
+	<div class="content-container page-main">
+
+		<button class="btn pagebtn-opensettings" onclick="openPage(0)"><img src="./images/settings.png"></button>
 
 		<h1 class="track-name"></h1>
 
@@ -23,9 +25,9 @@
 		<input id="music-select" type="file" accept="audio/*"/>
 
 		<div class="track-controls">
-			<button class="track-controls-button track-controls-skip-back" onclick="skipBack()"><img src="./images/skipback.png"></button>
-			<button class="track-controls-button track-controls-pause" onclick="playPause()"><img src="./images/play.png"></button>
-			<button class="track-controls-button track-controls-skip-forward" onclick="skipForward()"><img src="./images/skipforward.png"></button>
+			<button class="btn track-controls-skip-back" onclick="skipBack()"><img src="./images/skipback.png"></button>
+			<button class="btn track-controls-pause" onclick="playPause()"><img src="./images/play.png"></button>
+			<button class="btn track-controls-skip-forward" onclick="skipForward()"><img src="./images/skipforward.png"></button>
 		</div>
 
 		<div class="track-timeline">
@@ -39,6 +41,32 @@
 			<input type="range" min="0" max="120" step="0.01" value="0" class="track-timeline-front"/>
 			<span class="track-timeline-handle-visual"></span>
 
+		</div>
+
+	</div>
+
+	<div class="content-container page-settings">
+
+		<div class="page-header">
+			<button class="btn pagebtn-back" onclick="goBack(0)"><img src="./images/back.png"></button>
+			<h1 class="page-name">Settings</h1>
+		</div>
+
+		<h3 class="settings-param-name">Accent color</h3>
+
+		<div class="settings-param-rowcontainer settings-params-accentcolors">
+			<div class="settings-param-color" onclick="changeAccentColor(1, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(2, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(3, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(4, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(5, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(6, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(7, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(8, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(9, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(10, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(11, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(12, this)"></div>
 		</div>
 
 	</div>

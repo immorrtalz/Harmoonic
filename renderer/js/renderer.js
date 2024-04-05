@@ -89,6 +89,99 @@ function playSelectedFile(filePath)
 	}, 100);
 }
 
+var canTransitionBetweenPages = true;
+
+function openPage(nextPageIndex)
+{
+	if (!canTransitionBetweenPages) return;
+	canTransitionBetweenPages = false;
+
+	switch (nextPageIndex)
+	{
+		case 0: //settings
+			document.querySelector('.page-main').style.opacity = '0';
+			document.querySelector('.page-main').style.transform = 'scale(0.9)';
+			document.querySelector('.page-main').style.pointerEvents = 'none';
+
+			document.querySelector('.page-settings').style.opacity = '1';
+			document.querySelector('.page-settings').style.transform = 'scale(1)';
+			document.querySelector('.page-settings').style.pointerEvents = 'all';
+
+			setTimeout(() =>
+			{
+				document.querySelector('.page-main').style.transform = 'scale(1.1)';
+				canTransitionBetweenPages = true;
+			}, 200);
+			break;
+
+		case 1: //equalizer
+			break;
+	}
+}
+
+function goBack(currentPageIndex)
+{
+	if (!canTransitionBetweenPages) return;
+	canTransitionBetweenPages = false;
+
+	switch (currentPageIndex)
+	{
+		case 0: //settings
+			document.querySelector('.page-settings').style.opacity = '0';
+			document.querySelector('.page-settings').style.transform = 'scale(0.9)';
+			document.querySelector('.page-settings').style.pointerEvents = 'none';
+
+			document.querySelector('.page-main').style.opacity = '1';
+			document.querySelector('.page-main').style.transform = 'scale(1)';
+			document.querySelector('.page-main').style.pointerEvents = 'all';
+
+			setTimeout(() =>
+			{
+				document.querySelector('.page-settings').style.transform = 'scale(1.1)';
+				canTransitionBetweenPages = true;
+			}, 200);
+			break;
+
+		case 1: //equalizer
+			break;
+	}
+}
+
+function changeAccentColor(index, sender, saveToSettings = true)
+{
+	if (0 < index < 13)
+	{
+		document.documentElement.style.setProperty("--clr-accent", "var(--clr-template-" + index.toString() + ")");
+
+		if (sender === null) sender = document.querySelector('.settings-params-accentcolors').children[index - 1];
+
+		for (var i = 0; i < sender.parentElement.children.length; i++)
+			sender.parentElement.children[i].style.outline = "2px solid var(--clr-white-transparent-50)";
+
+		sender.style.outline = "2px solid rgba(255, 255, 255, 1)";
+
+		if (saveToSettings)
+		{
+			var settings = new Settings(index);
+			window.bridge.sendSettings(JSON.stringify(settings, undefined, 3));
+		}
+	}
+}
+
+window.bridge.sendSettingsToRenderer((event, data) =>
+{
+	var settings = JSON.parse(data); //Object.assign(new Settings, data);
+	changeAccentColor(settings.accentColor, null, false);
+});
+
+class Settings
+{
+	constructor(_accentColor)
+	{
+		this.accentColor = _accentColor;
+	}
+}
+
 function playPause()
 {
 	if (!isMusicSourceNull())
