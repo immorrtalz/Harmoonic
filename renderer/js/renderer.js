@@ -25,7 +25,7 @@ window.bridge.windowFocused((event, isFocused) =>
 window.bridge.sendSettingsToRenderer((event, data) =>
 {
 	if (data !== null && data.trim() != '') settings = data;
-	const colorIndex = parseInt(settings.split('\n')[0].split(' ')[1], 10);
+	var colorIndex = parseInt(settings.split('\n')[0].split(' ')[1], 10);
 	if (colorIndex === null || colorIndex === undefined) colorIndex = 10;
 	changeAccentColor(colorIndex, null, false);
 });
