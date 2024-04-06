@@ -14,10 +14,23 @@
 	<span class="main-gradient"></span>
 
 	<div class="draggable-zone"></div>
+	<div class="top-buttons">
+
+		<div class="app-buttons">
+			<!-- <button class="btn app-button" onclick="openPage(0, 2)"><img src="./images/eq.png"></button> -->
+			<button class="btn app-button" onclick="openPage(0, 1)"><img src="./images/settings.png"></button>
+		</div>
+
+		<div class="separator"></div>
+
+		<div class="app-buttons">
+			<button class="btn app-button" onclick="minimizeApp()"><img src="./images/minimize.png"></button>
+			<button class="btn app-button btn-close" onclick="closeApp()"><img src="./images/close.png"></button>
+		</div>
+
+	</div>
 
 	<div class="content-container page-main">
-
-		<button class="btn pagebtn-opensettings" onclick="openPage(0)"><img src="./images/settings.png"></button>
 
 		<h1 class="track-name"></h1>
 
@@ -48,7 +61,7 @@
 	<div class="content-container page-settings">
 
 		<div class="page-header">
-			<button class="btn pagebtn-back" onclick="goBack(0)"><img src="./images/back.png"></button>
+			<button class="btn btn-back" onclick="openPage(1, 0)"><img src="./images/back.png"></button>
 			<h1 class="page-name">Settings</h1>
 		</div>
 

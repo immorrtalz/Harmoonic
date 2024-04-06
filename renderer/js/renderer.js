@@ -8,49 +8,7 @@ const timelineHandle = document.querySelector(".track-timeline-handle-visual");
 const musicPlayer = document.querySelector('#music');
 //const inputNode = document.querySelector('#music-select');
 
-trackTimelineFront.addEventListener("input", (e) =>
-	{
-		if (!isMusicSourceNull())
-		{
-			musicPlayer.currentTime = e.target.value;
-			setTimelineHandlePosition();
-		}
-	})
-
-trackTimelineFront.addEventListener("mouseenter", () =>
-	{
-		if (!isMusicSourceNull())
-		{
-			timeTexts.classList.add('time-texts-hovered');
-			timelineHandle.classList.add('track-timeline-handle-visual-hovered');
-		}
-	});
-
-trackTimelineFront.addEventListener("mouseleave", () =>
-	{
-		if (!isMusicSourceNull())
-		{
-			timeTexts.classList.remove('time-texts-hovered');
-			timelineHandle.classList.remove('track-timeline-handle-visual-hovered');
-		}
-	});
-
-function setTimelineValue()
-{
-	trackTimelineFront.value = musicPlayer.currentTime;
-	setTimelineHandlePosition();
-}
-
-function setTimelineHandlePosition()
-{
-	var handlePosition = trackTimelineFront.offsetWidth * remap(trackTimelineFront.value, 0, Math.floor(musicPlayer.duration), 0, 1) * 0.975;
-	timelineHandle.style.left = handlePosition + 'px';
-}
-
-function remap(value, low1, high1, low2, high2)
-{
-	return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
-}
+var settings = 'accentColor 10';
 
 window.bridge.sendFilePath((event, filePath) =>
 {
@@ -64,14 +22,67 @@ window.bridge.windowFocused((event, isFocused) =>
 	document.querySelector('.main-gradient').style.background = "linear-gradient(to top, var(--clr-accent), " + temp;
 });
 
-musicPlayer.addEventListener('loadedmetadata', () =>
+window.bridge.sendSettingsToRenderer((event, data) =>
+{
+	if (data !== null && data.trim() != '') settings = data;
+	const colorIndex = parseInt(settings.split('\n')[0].split(' ')[1], 10);
+	if (colorIndex === null || colorIndex === undefined) colorIndex = 10;
+	changeAccentColor(colorIndex, null, false);
+});
+
+trackTimelineFront.addEventListener("input", (e) =>
+{
+	if (!isMusicSourceNull())
 	{
-		trackTimelineFront.max = Math.floor(musicPlayer.duration);
-		setTimelineValue();
-		setTimeText1();
-		setTimeText2();
-		play(true);
-	});
+		musicPlayer.currentTime = e.target.value;
+		if (musicPlayer.duration - musicPlayer.currentTime < 1) musicPlayer.play();
+		setTimelineHandlePosition();
+		setTimeText(1);
+	}
+});
+
+trackTimelineFront.addEventListener("mouseenter", () =>
+{
+	if (!isMusicSourceNull())
+	{
+		timeTexts.classList.add('time-texts-hovered');
+		timelineHandle.classList.add('track-timeline-handle-visual-hovered');
+	}
+});
+
+trackTimelineFront.addEventListener("mouseleave", () =>
+{
+	if (!isMusicSourceNull())
+	{
+		timeTexts.classList.remove('time-texts-hovered');
+		timelineHandle.classList.remove('track-timeline-handle-visual-hovered');
+	}
+});
+
+function setTimelineValue()
+{
+	trackTimelineFront.value = musicPlayer.currentTime;
+	setTimelineHandlePosition();
+}
+
+function setTimelineHandlePosition()
+{
+	var handlePosition = trackTimelineFront.offsetWidth * remap(trackTimelineFront.value, 0, Math.floor(musicPlayer.duration), 0, 1) * 0.975;
+	timelineHandle.style.left = handlePosition + 'px';
+}
+
+musicPlayer.addEventListener('loadeddata', () =>
+{
+	trackTimelineFront.max = Math.floor(musicPlayer.duration);
+	setTimelineValue();
+	setTimeText(1);
+	setTimeText(2);
+	play(true);
+});
+
+musicPlayer.addEventListener("pause", (event) => pause(true));
+musicPlayer.addEventListener("play", (event) => play(true));
+musicPlayer.addEventListener("ended", (event) => pause(true));
 
 function playSelectedFile(filePath)
 {
@@ -84,102 +95,10 @@ function playSelectedFile(filePath)
 		if (!musicPlayer.paused)
 		{
 			setTimelineValue();
-			setTimeText1();
+			setTimeText(1);
+			if (musicPlayer.duration - musicPlayer.currentTime <= 1) pause(true);
 		}
 	}, 100);
-}
-
-var canTransitionBetweenPages = true;
-
-function openPage(nextPageIndex)
-{
-	if (!canTransitionBetweenPages) return;
-	canTransitionBetweenPages = false;
-
-	switch (nextPageIndex)
-	{
-		case 0: //settings
-			document.querySelector('.page-main').style.opacity = '0';
-			document.querySelector('.page-main').style.transform = 'scale(0.9)';
-			document.querySelector('.page-main').style.pointerEvents = 'none';
-
-			document.querySelector('.page-settings').style.opacity = '1';
-			document.querySelector('.page-settings').style.transform = 'scale(1)';
-			document.querySelector('.page-settings').style.pointerEvents = 'all';
-
-			setTimeout(() =>
-			{
-				document.querySelector('.page-main').style.transform = 'scale(1.1)';
-				canTransitionBetweenPages = true;
-			}, 200);
-			break;
-
-		case 1: //equalizer
-			break;
-	}
-}
-
-function goBack(currentPageIndex)
-{
-	if (!canTransitionBetweenPages) return;
-	canTransitionBetweenPages = false;
-
-	switch (currentPageIndex)
-	{
-		case 0: //settings
-			document.querySelector('.page-settings').style.opacity = '0';
-			document.querySelector('.page-settings').style.transform = 'scale(0.9)';
-			document.querySelector('.page-settings').style.pointerEvents = 'none';
-
-			document.querySelector('.page-main').style.opacity = '1';
-			document.querySelector('.page-main').style.transform = 'scale(1)';
-			document.querySelector('.page-main').style.pointerEvents = 'all';
-
-			setTimeout(() =>
-			{
-				document.querySelector('.page-settings').style.transform = 'scale(1.1)';
-				canTransitionBetweenPages = true;
-			}, 200);
-			break;
-
-		case 1: //equalizer
-			break;
-	}
-}
-
-function changeAccentColor(index, sender, saveToSettings = true)
-{
-	if (0 < index < 13)
-	{
-		document.documentElement.style.setProperty("--clr-accent", "var(--clr-template-" + index.toString() + ")");
-
-		if (sender === null) sender = document.querySelector('.settings-params-accentcolors').children[index - 1];
-
-		for (var i = 0; i < sender.parentElement.children.length; i++)
-			sender.parentElement.children[i].style.outline = "2px solid var(--clr-white-transparent-50)";
-
-		sender.style.outline = "2px solid rgba(255, 255, 255, 1)";
-
-		if (saveToSettings)
-		{
-			var settings = new Settings(index);
-			window.bridge.sendSettings(JSON.stringify(settings, undefined, 3));
-		}
-	}
-}
-
-window.bridge.sendSettingsToRenderer((event, data) =>
-{
-	var settings = JSON.parse(data); //Object.assign(new Settings, data);
-	changeAccentColor(settings.accentColor, null, false);
-});
-
-class Settings
-{
-	constructor(_accentColor)
-	{
-		this.accentColor = _accentColor;
-	}
 }
 
 function playPause()
@@ -187,7 +106,7 @@ function playPause()
 	if (!isMusicSourceNull())
 	{
 		setTimelineValue();
-		setTimeText1();
+		setTimeText(1);
 
 		if (musicPlayer.paused) play();
 		else pause();
@@ -212,7 +131,7 @@ function skipBack()
 	{
 		musicPlayer.currentTime = 0;
 		setTimelineValue();
-		setTimeText1();
+		setTimeText(1);
 	}
 }
 
@@ -221,15 +140,10 @@ function skipForward()
 	if (!isMusicSourceNull())
 	{
 		musicPlayer.currentTime = musicPlayer.duration;
+		if (musicPlayer.duration - musicPlayer.currentTime < 1) musicPlayer.play();
 		setTimelineValue();
-		setTimeText1();
-		pause(true);
+		setTimeText(1);
 	}
-}
-
-function isMusicSourceNull()
-{
-	return musicPlayer.src === "" || musicPlayer.src === null;
 }
 
 function setTrackNameText(filePath)
@@ -237,32 +151,95 @@ function setTrackNameText(filePath)
 	pathSep = '';
 	if (filePath.includes('\\')) pathSep = '\\';
 	if (filePath.includes('/')) pathSep = '/';
-	fPath = pathSep != '' ? filePath.split(pathSep)[filePath.split(pathSep).length - 1] : filePath;
-	trackName.textContent = fPath;
+	trackName.textContent = pathSep != '' ? filePath.split(pathSep)[filePath.split(pathSep).length - 1] : filePath;
 }
 
-function setTimeText1()
+function setTimeText(index)
 {
-	var hours = String(Math.floor(musicPlayer.currentTime / 3600));
-	var minutes = String(Math.floor(musicPlayer.currentTime % 3600 / 60));
-	var seconds = String(Math.floor(musicPlayer.currentTime % 3600 % 60));
+	var time = index == 1 ? musicPlayer.currentTime : musicPlayer.duration;
+
+	var hours = String(Math.floor(time / 60 / 60));
+	var minutes = String(Math.floor(time / 60 % 60));
+	var seconds = String(Math.floor(time % 60));
 
 	if (minutes.length < 2) minutes = '0' + minutes;
 	if (seconds.length < 2) seconds = '0' + seconds;
 
-	if (musicPlayer.currentTime / 60 < 60) timeText1.textContent = minutes + ":" + seconds;
-	else timeText1.textContent = hours + ":" + minutes + ":" + seconds;
+	var textElm = index == 1 ? timeText1 : timeText2;
+	textElm.textContent = (hours == '0' ? '' : (hours + ":")) + minutes + ":" + seconds;
 }
 
-function setTimeText2()
+var canTransitionBetweenPages = true;
+
+function openPage(prevPageIndex, nextPageIndex)
 {
-	var hours = String(Math.floor(musicPlayer.duration / 3600));
-	var minutes = String(Math.floor(musicPlayer.duration % 3600 / 60));
-	var seconds = String(Math.floor(musicPlayer.duration % 3600 % 60));
+	if (!canTransitionBetweenPages || prevPageIndex == nextPageIndex) return;
+	canTransitionBetweenPages = false;
 
-	if (minutes.length < 2) minutes = '0' + minutes;
-	if (seconds.length < 2) seconds = '0' + seconds;
+	var prevPageName = '.page-';
+	var nextPageName = '.page-';
 
-	if (musicPlayer.duration / 60 < 60) timeText2.textContent = minutes + ":" + seconds;
-	else timeText2.textContent = hours + ":" + minutes + ":" + seconds;
+	const pageNames = ['main', 'settings', 'equalizer'];
+
+	prevPageName += pageNames[prevPageIndex];
+	nextPageName += pageNames[nextPageIndex];
+
+	document.querySelector(prevPageName).style.opacity = '0';
+	document.querySelector(prevPageName).style.transform = 'scale(0.9)';
+	document.querySelector(prevPageName).style.pointerEvents = 'none';
+
+	document.querySelector(nextPageName).style.opacity = '1';
+	document.querySelector(nextPageName).style.transform = 'scale(1)';
+
+	setTimeout(() =>
+	{
+		document.querySelector(prevPageName).style.transform = 'scale(1.1)';
+		document.querySelector(nextPageName).style.pointerEvents = 'all';
+		canTransitionBetweenPages = true;
+	}, 200);
+}
+
+function minimizeApp()
+{
+	window.bridge.minimizeApp();
+}
+
+function closeApp()
+{
+	window.bridge.closeApp();
+}
+
+function changeAccentColor(index, sender, saveToSettings = true)
+{
+	if (1 <= index <= 12)
+	{
+		document.documentElement.style.setProperty("--clr-accent", "var(--clr-template-" + index.toString() + ")");
+
+		if (sender === null) sender = document.querySelector('.settings-params-accentcolors').children[index - 1];
+
+		for (var i = 0; i < sender.parentElement.children.length; i++)
+			sender.parentElement.children[i].style.outline = "2px solid var(--clr-white-transparent-50)";
+
+		sender.style.outline = "2px solid rgba(255, 255, 255, 1)";
+
+		changeSetting('accentColor', index.toString(), saveToSettings);
+	}
+}
+
+function changeSetting(settingName, settingValue, saveToSettings = true)
+{
+	var _settings = settings.split('\n');
+	_settings[0] = settingName + ' ' + settingValue;
+	settings = _settings.join('\n');
+	if (saveToSettings) window.bridge.sendSettings(settings);
+}
+
+function remap(value, low1, high1, low2, high2)
+{
+	return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
+
+function isMusicSourceNull()
+{
+	return musicPlayer.src === null || musicPlayer.src.trim() == '';
 }

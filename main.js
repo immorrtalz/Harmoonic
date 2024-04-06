@@ -21,8 +21,7 @@ if (isWin)
 	useTransparentDesign = sysVer.slice(-1) > 22621;
 }
 
-if (!isDev && (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " " || !isExtensionSupported()))
-	app.exit(0);
+if (!isDev && (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " " || !isExtensionSupported())) app.exit(0);
 
 function isExtensionSupported()
 {
@@ -33,8 +32,7 @@ function isExtensionSupported()
 const isSingleInstance = app.requestSingleInstanceLock(additionalDataFilePath);
 
 //runs on second instance
-if (!isSingleInstance)
-	app.exit(0);
+if (!isSingleInstance) app.exit(0);
 
 var mainWindow;
 
@@ -54,22 +52,17 @@ function createMainWindow()
 {
 	const windowWidth = isDev ? 1000 : 400;
 	const windowHeight = isDev ? 700 : 200;
+	const workAreaSize = screen.getPrimaryDisplay().workAreaSize;
 
 	mainWindow = new BrowserWindow(
 	{
 		title: 'Harmoonic',
-		x: (screen.getPrimaryDisplay().workAreaSize.width - windowWidth) / 2,
-		y: screen.getPrimaryDisplay().workAreaSize.height - windowHeight - 16,
+		x: (workAreaSize.width - windowWidth) / 2,
+		y: workAreaSize.height - windowHeight - 16,
 		width: windowWidth,
 		height: windowHeight,
 		center: false,
 		titleBarStyle: 'hidden',
-		titleBarOverlay:
-		{
-			color: '#0000',
-			symbolColor: '#ffffff64',
-			height: 20,
-		},
 		backgroundColor: useTransparentDesign ? '#0000' : '#101015',
 		backgroundMaterial: useTransparentDesign ? 'acrylic' : 'none',
 		maximizable: false,
@@ -86,18 +79,13 @@ function createMainWindow()
 	//open devtools if in dev env
 	if (isDev) mainWindow.webContents.openDevTools();
 
-	var filePath = "";
-
-	if (process.argv.length >= 2)
-		filePath = process.argv[1];
-
 	mainWindow.loadFile(path.join(__dirname, './renderer/index.html')).then(() =>
-		{
-			mainWindow.webContents.send('sendFilePath', filePath);
-		}).then(() =>
-		{
-			mainWindow.show();
-		});
+	{
+		mainWindow.webContents.send('sendFilePath', process.argv.length >= 2 ? process.argv[1] : '');
+	}).then(() =>
+	{
+		mainWindow.show();
+	});
 }
 
 app.whenReady().then(() =>
@@ -105,36 +93,32 @@ app.whenReady().then(() =>
 	if (!mainWindow)
 	{
 		const settingsFilePath = path.join(app.getPath('userData'), "settings.txt");
-		const settingsData = fs.readFileSync(settingsFilePath, { encoding: 'utf-8', flag: 'r' });
 
 		ipcMain.on('sendSettings', (event, data) =>
 		{
-			try
-			{
-				fs.writeFileSync(settingsFilePath, data, 'utf-8');
-			}
-			catch(e)
-			{
-				console.log('Failed to save settings file!\n', e); //TODO: error message
-			}
+			try { fs.writeFileSync(settingsFilePath, data, 'utf-8'); }
+			catch (e) { /* TODO: error message "Failed to save settings file" */ }
 		});
+
+		ipcMain.on('minimizeApp', (event) => { mainWindow.minimize(); });
+		ipcMain.on('closeApp', (event) => { app.exit(0); });
 
 		createMainWindow();
 
 		//implement menu
-		const mainMenu = Menu.buildFromTemplate(menu);
-		Menu.setApplicationMenu(mainMenu);
+		Menu.setApplicationMenu(Menu.buildFromTemplate([]));
 
 		app.on('activate', () =>
 		{
-			if (BrowserWindow.getAllWindows().length === 0)
-				createMainWindow();
+			if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
 		});
+
+		var settingsData = '';
+		if (fs.existsSync(settingsFilePath)) settingsData = fs.readFileSync(settingsFilePath, { encoding: 'utf-8', flag: 'r' });
 
 		mainWindow.webContents.on('did-finish-load', () =>
 		{
-			if (settingsData !== null && settingsData.trim() !== '')
-				mainWindow.webContents.send('sendSettingsToRenderer', settingsData);
+			mainWindow.webContents.send('sendSettingsToRenderer', settingsData);
 		});
 
 		/* for (var i = 0; i < process.argv.length; i++)
@@ -153,8 +137,6 @@ app.on('browser-window-focus', () =>
 {
 	if (useTransparentDesign) mainWindow.webContents.send('windowFocused', true);
 });
-
-const menu = [];
 
 app.on('window-all-closed', () =>
 {

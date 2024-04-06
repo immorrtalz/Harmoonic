@@ -20,6 +20,14 @@ contextBridge.exposeInMainWorld(
 		sendSettingsToRenderer: (data) =>
 		{
 			ipcRenderer.on('sendSettingsToRenderer', data);
+		},
+		minimizeApp: () =>
+		{
+			ipcRenderer.send('minimizeApp');
+		},
+		closeApp: () =>
+		{
+			ipcRenderer.send('closeApp');
 		}
 	}
 );
