@@ -11,7 +11,7 @@ Simple audio player with modern design
 
 ---
 
-Open source and Windows only, but technically can be built for MacOS and Linux
+Open source and Windows only
 
 > [!CAUTION]
 > **[Windows Defender issue](https://github.com/immorrtalz/Harmoonic/issues/9)**
@@ -19,4 +19,6 @@ Open source and Windows only, but technically can be built for MacOS and Linux
 > [!TIP]
 > **Download the latest release: https://github.com/immorrtalz/Harmoonic/releases/latest**
 
-![harmoonic-screenshot](https://github.com/immorrtalz/Harmoonic/assets/61843974/70816ba7-7c53-43cc-80f8-f767703748de)
+![harmoonic-screenshot-1](https://github.com/immorrtalz/Harmoonic/assets/61843974/b824b7c9-ffbc-4a99-bd7f-d776113897d6)
+![harmoonic-screenshot-2](https://github.com/immorrtalz/Harmoonic/assets/61843974/007ccb9e-d98c-424b-ba89-56cc0d4ea08e)
+![harmoonic-screenshot-3](https://github.com/immorrtalz/Harmoonic/assets/61843974/27210765-bc8e-4343-91fa-c9ac5ac5096d)
