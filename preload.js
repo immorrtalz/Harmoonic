@@ -1,10 +1,8 @@
-const { contextBridge, ipcRenderer, ipcMain } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld(
-	//Allowed 'ipcRenderer' methods
 	'bridge',
 	{
-		//From main to renderer
 		sendFilePath: (message) =>
 		{
 			ipcRenderer.on('sendFilePath', message);
@@ -28,6 +26,22 @@ contextBridge.exposeInMainWorld(
 		closeApp: () =>
 		{
 			ipcRenderer.send('closeApp');
+		},
+		sendPlayPauseToRenderer: (data) =>
+		{
+			ipcRenderer.on('sendPlayPauseToRenderer', data);
+		},
+		sendSkipBackToRenderer: (data) =>
+		{
+			ipcRenderer.on('sendSkipBackToRenderer', data);
+		},
+		sendSkipForwardToRenderer: (data) =>
+		{
+			ipcRenderer.on('sendSkipForwardToRenderer', data);
+		},
+		sendPlayPauseToMain: (isPause) =>
+		{
+			ipcRenderer.send('sendPlayPauseToMain', isPause);
 		}
 	}
 );

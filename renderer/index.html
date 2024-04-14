@@ -5,8 +5,6 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self'"> -->
-	<!-- <title>Harmoonic</title> -->
-	<!-- <link href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,500,600,700,800,900" rel="stylesheet"> -->
 	<link rel="stylesheet" type="text/css" href="./css/styles.css">
 </head>
 
@@ -17,8 +15,8 @@
 	<div class="top-buttons">
 
 		<div class="app-buttons">
-			<!-- <button class="btn app-button" onclick="openPage(0, 2)"><img src="./images/eq.png"></button> -->
-			<button class="btn app-button" onclick="openPage(0, 1)"><img src="./images/settings.png"></button>
+			<button class="btn app-button" onclick="openPage(2)"><img src="./images/eq.png"></button>
+			<button class="btn app-button" onclick="openPage(1)"><img src="./images/settings.png"></button>
 		</div>
 
 		<div class="separator"></div>
@@ -61,7 +59,7 @@
 	<div class="content-container page-settings">
 
 		<div class="page-header">
-			<button class="btn btn-back" onclick="openPage(1, 0)"><img src="./images/back.png"></button>
+			<button class="btn btn-back" onclick="openPage(0)"><img src="./images/back.png"></button>
 			<h1 class="page-name">Settings</h1>
 		</div>
 
@@ -80,6 +78,107 @@
 			<div class="settings-param-color" onclick="changeAccentColor(10, this)"></div>
 			<div class="settings-param-color" onclick="changeAccentColor(11, this)"></div>
 			<div class="settings-param-color" onclick="changeAccentColor(12, this)"></div>
+		</div>
+
+	</div>
+
+	<div class="content-container page-equalizer">
+
+		<div class="page-header">
+			<button class="btn btn-back" onclick="openPage(0)"><img src="./images/back.png"></button>
+			<h1 class="page-name">Equalizer</h1>
+			<button class="btn app-button btn-back" onclick="setEQ([0])"><img src="./images/reset.png"></button>
+		</div>
+
+		<div class="equalizer-bars">
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+		</div>
+
+		<div class="equalizer-bar-texts">
+			<p class="equalizer-bar-text">30</p>
+			<p class="equalizer-bar-text">125</p>
+			<p class="equalizer-bar-text">250</p>
+			<p class="equalizer-bar-text">500</p>
+			<p class="equalizer-bar-text">1K</p>
+			<p class="equalizer-bar-text">2K</p>
+			<p class="equalizer-bar-text">4K</p>
+			<p class="equalizer-bar-text">8K</p>
+			<p class="equalizer-bar-text">12K</p>
+			<p class="equalizer-bar-text">16K</p>
+		</div>
+
+		<div class="equalizer-default-values-dots">
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
 		</div>
 
 	</div>

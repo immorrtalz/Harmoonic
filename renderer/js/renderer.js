@@ -6,9 +6,10 @@ const timeText2 = document.querySelector("#time-text-2");
 const trackTimelineFront = document.querySelector(".track-timeline-front");
 const timelineHandle = document.querySelector(".track-timeline-handle-visual");
 const musicPlayer = document.querySelector('#music');
-//const inputNode = document.querySelector('#music-select');
+const equalizerBarFronts = document.querySelectorAll(".equalizer-bar-front");
+const equalizerBarHandles = document.querySelectorAll(".equalizer-bar-handle-visual");
 
-var settings = 'accentColor 10';
+var settings = 'accentColor 10\neq 0/0/0/0/0/0/0/0/0/0';
 
 window.bridge.sendFilePath((event, filePath) =>
 {
@@ -25,9 +26,34 @@ window.bridge.windowFocused((event, isFocused) =>
 window.bridge.sendSettingsToRenderer((event, data) =>
 {
 	if (data !== null && data.trim() != '') settings = data;
+
 	var colorIndex = parseInt(settings.split('\n')[0].split(' ')[1], 10);
 	if (colorIndex === null || colorIndex === undefined) colorIndex = 10;
 	changeAccentColor(colorIndex, null, false);
+
+	var eq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	var temp = settings.split('\n')[1].split(' ')[1];
+	for (var i = 0; i < eq.length; i++)
+	{
+		eq[i] = parseFloat(temp.split('/')[i]);
+		if (eq[i] === null || eq[i] === undefined) eq[i] = 0;
+	}
+	setEQ(eq, false);
+});
+
+window.bridge.sendPlayPauseToRenderer((event, data) =>
+{
+	playPause(false);
+});
+
+window.bridge.sendSkipBackToRenderer((event, data) =>
+{
+	skipBack();
+});
+
+window.bridge.sendSkipForwardToRenderer((event, data) =>
+{
+	skipForward();
 });
 
 trackTimelineFront.addEventListener("input", (e) =>
@@ -80,9 +106,95 @@ musicPlayer.addEventListener('loadeddata', () =>
 	play(true);
 });
 
-musicPlayer.addEventListener("pause", (event) => pause(true));
-musicPlayer.addEventListener("play", (event) => play(true));
-musicPlayer.addEventListener("ended", (event) => pause(true));
+musicPlayer.addEventListener("pause", (event) => 
+{
+	pause(true);
+	window.bridge.sendPlayPauseToMain(musicPlayer.paused);
+});
+musicPlayer.addEventListener("play", (event) => 
+{
+	play(true);
+	window.bridge.sendPlayPauseToMain(musicPlayer.paused);
+});
+musicPlayer.addEventListener("ended", (event) => 
+{
+	pause(true);
+	window.bridge.sendPlayPauseToMain(musicPlayer.paused);
+});
+
+window.AudioContext = window.AudioContext;
+
+var context = new AudioContext();
+context.sampleRate = 48000 * 2;
+var filters;
+const frequencies = [30, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
+
+var createFilter = function(frequency)
+{
+	var filter = context.createBiquadFilter();
+
+	if (frequency == frequencies[0]) filter.type = 'lowshelf';
+	else if (frequency == frequencies[frequencies.length - 1]) filter.type = 'highshelf';
+	else filter.type = 'peaking';
+
+	filter.frequency.value = frequency;
+	filter.Q.value = 0.75;
+	filter.gain.value = 0;
+
+	return filter;
+}
+
+function equalize()
+{
+	var source = context.createMediaElementSource(musicPlayer);
+	filters = frequencies.map(createFilter);
+
+	for (var i = 0; i < filters.length - 1; i++)
+		filters[i].connect(filters[i + 1]);
+
+	source.connect(filters[0]);
+	filters[filters.length - 1].connect(context.destination);
+
+	inputs = document.querySelectorAll('.equalizer-bar-front');
+
+	for (var i = 0; i < inputs.length; i++)
+	{
+		inputs[i].addEventListener('input', (e) =>
+		{
+			const index = Array.from(e.target.parentElement.parentElement.children).indexOf(e.target.parentElement);
+
+			if (Math.abs(e.target.value) < 0.5) e.target.value = 0;
+			filters[index].gain.value = e.target.value;
+			setEqualizerBarHandlePosition(index);
+
+			var data = settings.split('\n')[1].split(' ')[1].split('/');
+			data[index] = e.target.value;
+			changeSetting(1, data.join('/'), true);
+		}, false);
+	}
+}
+
+equalize();
+
+function setEqualizerBarHandlePosition(index)
+{
+	var handlePosition = remap(equalizerBarFronts[index].value, equalizerBarFronts[index].min, equalizerBarFronts[index].max, 104, 0) * 0.925;
+	equalizerBarHandles[index].style.top = handlePosition + 'px';
+}
+
+function setEQ(values, saveToSettings = true)
+{
+	if (values.length != filters.length) values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+	for (var i = 0; i < filters.length; i++)
+	{
+		filters[i].gain.value = values[i];
+		inputs[i].value = values[i];
+		setEqualizerBarHandlePosition(i);
+	}
+
+	changeSetting(1, values.join('/'), saveToSettings);
+}
 
 function playSelectedFile(filePath)
 {
@@ -101,7 +213,7 @@ function playSelectedFile(filePath)
 	}, 100);
 }
 
-function playPause()
+function playPause(sendToMain = true)
 {
 	if (!isMusicSourceNull())
 	{
@@ -110,6 +222,8 @@ function playPause()
 
 		if (musicPlayer.paused) play();
 		else pause();
+
+		if (sendToMain) window.bridge.sendPlayPauseToMain(musicPlayer.paused);
 	}
 }
 
@@ -171,9 +285,23 @@ function setTimeText(index)
 
 var canTransitionBetweenPages = true;
 
-function openPage(prevPageIndex, nextPageIndex)
+function getCurrentPageIndex()
 {
-	if (!canTransitionBetweenPages || prevPageIndex == nextPageIndex) return;
+	const pages = document.querySelectorAll('.content-container');
+
+	for (var i = 0; i < pages.length; i++)
+	{
+		if (parseFloat(pages[i].style.opacity) > 0.9) return i;
+	}
+
+	return 0;
+}
+
+function openPage(nextPageIndex)
+{
+	if (!canTransitionBetweenPages) return;
+	const prevPageIndex = getCurrentPageIndex();
+	if (prevPageIndex == nextPageIndex) return;
 	canTransitionBetweenPages = false;
 
 	var prevPageName = '.page-';
@@ -187,9 +315,11 @@ function openPage(prevPageIndex, nextPageIndex)
 	document.querySelector(prevPageName).style.opacity = '0';
 	document.querySelector(prevPageName).style.transform = 'scale(0.9)';
 	document.querySelector(prevPageName).style.pointerEvents = 'none';
+	document.querySelector(prevPageName).style.zIndex = '-1';
 
 	document.querySelector(nextPageName).style.opacity = '1';
 	document.querySelector(nextPageName).style.transform = 'scale(1)';
+	document.querySelector(nextPageName).style.zIndex = '0';
 
 	setTimeout(() =>
 	{
@@ -222,14 +352,29 @@ function changeAccentColor(index, sender, saveToSettings = true)
 
 		sender.style.outline = "2px solid rgba(255, 255, 255, 1)";
 
-		changeSetting('accentColor', index.toString(), saveToSettings);
+		changeSetting(0, index.toString(), saveToSettings);
 	}
 }
 
-function changeSetting(settingName, settingValue, saveToSettings = true)
+function changeSetting(settingIndex, settingValue, saveToSettings = true)
 {
 	var _settings = settings.split('\n');
-	_settings[0] = settingName + ' ' + settingValue;
+
+	var settingName;
+
+	switch (settingIndex)
+	{
+		case 0:
+			settingName = 'accentColor';
+			break;
+
+		case 1:
+			settingName = 'eq';
+			break;
+	}
+
+	_settings[settingIndex] = settingName + ' ' + settingValue;
+
 	settings = _settings.join('\n');
 	if (saveToSettings) window.bridge.sendSettings(settings);
 }

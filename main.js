@@ -85,6 +85,58 @@ function createMainWindow()
 	}).then(() =>
 	{
 		mainWindow.show();
+
+		var thumbarButtons1 = [
+		{
+			icon: path.join(__dirname, './renderer/images/thumbarButtons/skipback.png'),
+			click: () => { mainWindow.webContents.send('sendSkipBackToRenderer', ''); }
+		},
+		{
+			icon: path.join(__dirname, './renderer/images/thumbarButtons/pause.png'),
+			click: () =>
+			{
+				mainWindow.webContents.send('sendPlayPauseToRenderer');
+				mainWindow.setThumbarButtons(thumbarButtons2);
+			}
+		},
+		{
+			icon: path.join(__dirname, './renderer/images/thumbarButtons/skipforward.png'),
+			click: () =>
+			{
+				mainWindow.webContents.send('sendSkipForwardToRenderer', '');
+				mainWindow.setThumbarButtons(thumbarButtons2);
+			}
+		}];
+
+		var thumbarButtons2 = [
+		{
+			icon: path.join(__dirname, './renderer/images/thumbarButtons/skipback.png'),
+			click: () => { mainWindow.webContents.send('sendSkipBackToRenderer', ''); }
+		},
+		{
+			icon: path.join(__dirname, './renderer/images/thumbarButtons/play.png'),
+			click: () =>
+			{
+				mainWindow.webContents.send('sendPlayPauseToRenderer');
+				mainWindow.setThumbarButtons(thumbarButtons1);
+			}
+		},
+		{
+			icon: path.join(__dirname, './renderer/images/thumbarButtons/skipforward.png'),
+			click: () =>
+			{
+				mainWindow.webContents.send('sendSkipForwardToRenderer', '');
+				mainWindow.setThumbarButtons(thumbarButtons2);
+			}
+		}];
+
+		mainWindow.setThumbarButtons(thumbarButtons1);
+
+		ipcMain.on('sendPlayPauseToMain', (event, isPause) =>
+		{
+			if (isPause) mainWindow.setThumbarButtons(thumbarButtons2);
+			else mainWindow.setThumbarButtons(thumbarButtons1);
+		});
 	});
 }
 

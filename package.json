@@ -1,8 +1,8 @@
 {
 	"name": "Harmoonic",
 	"productName": "Harmoonic",
-	"version": "0.3.0",
-	"icon": "build/icon.png",
+	"version": "0.4.0",
+	"icon": "build/icon.ico",
 	"description": "Simple audio player with modern design",
 	"main": "main.js",
 	"scripts": {
@@ -78,7 +78,8 @@
 		"deleteAppDataOnUninstall": true,
 		"oneClick": false,
 		"multiLanguageInstaller": false,
-		"installerIcon": "build/icon.png",
-		"installerHeaderIcon": "build/icon.png"
+		"icon": "build/icon.ico",
+		"installerIcon": "build/icon.ico",
+		"installerHeaderIcon": "build/icon.ico"
 	}
 }
