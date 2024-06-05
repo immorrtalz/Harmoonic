@@ -1,85 +1,12 @@
 {
-	"name": "Harmoonic",
-	"productName": "Harmoonic",
-	"version": "0.4.0",
-	"icon": "build/icon.ico",
-	"description": "Simple audio player with modern design",
-	"main": "main.js",
+	"name": "harmoonic",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
 	"scripts": {
-		"start": "electron .",
-		"build": "electron-builder --win",
-		"update-all": "npm install --save"
-	},
-	"author": "EVERMEDIA PROJECT",
-	"copyright": "Copyright © 2024 ${author}",
-	"license": "GPL-3.0",
-	"homepage": "https://github.com/immorrtalz/Harmoonic",
-	"repository": "github:immorrtalz/Harmoonic",
-	"bugs": {
-		"url": "https://github.com/immorrtalz/Harmoonic/issues"
+		"tauri": "tauri"
 	},
 	"devDependencies": {
-		"electron": "^28.1.4",
-		"electron-builder": "^24.9.1"
-	},
-	"dependencies": {
-		"electron-updater": "^6.1.7"
-	},
-	"build": {
-		"appId": "com.EVERMEDIAPROJECT.Harmoonic",
-		"fileAssociations": [
-			{
-				"ext": "mp3"
-			},
-			{
-				"ext": "wav"
-			},
-			{
-				"ext": "weba"
-			},
-			{
-				"ext": "webm"
-			},
-			{
-				"ext": "m4a"
-			},
-			{
-				"ext": "ogg"
-			},
-			{
-				"ext": "oga"
-			},
-			{
-				"ext": "caf"
-			},
-			{
-				"ext": "flac"
-			},
-			{
-				"ext": "opus"
-			},
-			{
-				"ext": "mid"
-			},
-			{
-				"ext": "aiff"
-			},
-			{
-				"ext": "wma"
-			},
-			{
-				"ext": "au"
-			}
-		]
-	},
-	"win": {
-		"target": "nsis",
-		"perMachine": true,
-		"deleteAppDataOnUninstall": true,
-		"oneClick": false,
-		"multiLanguageInstaller": false,
-		"icon": "build/icon.ico",
-		"installerIcon": "build/icon.ico",
-		"installerHeaderIcon": "build/icon.ico"
+		"@tauri-apps/cli": "^1"
 	}
 }

@@ -1,1 +1,1 @@
-npm run update-all && npm start
+npm run tauri dev

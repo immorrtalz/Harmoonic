@@ -1,0 +1,48 @@
+{
+	"build": {
+		"devPath": "../src",
+		"distDir": "../src",
+		"withGlobalTauri": true
+	},
+	"package": {
+		"productName": "Harmoonic",
+		"version": "0.4.1"
+	},
+	"tauri": {
+		"allowlist": {
+			"all": false,
+			"window": {
+				"all": true
+			}
+		},
+		"windows": [
+			{
+				"label": "main",
+				"width": 400,
+				"height": 200,
+				"resizable": false,
+				"maximizable": false,
+				"fileDropEnabled": false,
+				"x": 0,
+				"y": 0,
+				"transparent": true,
+				"decorations": false
+			}
+		],
+		"security": {
+			"csp": null
+		},
+		"bundle": {
+			"active": false,
+			"targets": "all",
+			"identifier": "com.EVERMEDIAPROJECT.Harmoonic",
+			"publisher": "EVERMEDIAPROJECT",
+			"icon": [
+				"icons/icon.ico"
+			],
+			"copyright": "Copyright © 2024 EVERMEDIAPROJECT",
+			"category": "Music",
+			"shortDescription": "Simple audio player with modern design"
+		}
+	}
+}

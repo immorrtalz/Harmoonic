@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Harmoonic</title>
+	<link rel="stylesheet" href="./styles.css">
+	<script type="module" src="./main.js" defer></script>
+</head>
+
+<body>
+	<span class="main-gradient"></span>
+
+	<div class="draggable-zone" data-tauri-drag-region></div>
+	<div class="top-buttons">
+
+		<div class="app-buttons">
+			<button class="btn app-button" onclick="openPage(2)"><img src="./assets/eq.png"></button>
+			<button class="btn app-button" onclick="openPage(1)"><img src="./assets/settings.png"></button>
+		</div>
+
+		<div class="separator"></div>
+
+		<div class="app-buttons">
+			<button class="btn app-button" onclick="minimizeApp()"><img src="./assets/minimize.png"></button>
+			<button class="btn app-button btn-close" onclick="closeApp()"><img src="./assets/close.png"></button>
+		</div>
+
+	</div>
+
+	<div class="content-container page-main">
+
+		<h1 class="track-name"></h1>
+
+		<audio id="music" preload="metadata" autoplay="autoplay"></audio>
+		<input id="music-select" type="file" accept="audio/*"/>
+
+		<div class="track-controls">
+			<button class="btn track-controls-skip-back" onclick="skipBack()"><img src="./assets/skipback.png"></button>
+			<button class="btn track-controls-pause" onclick="playPause()"><img src="./assets/play.png"></button>
+			<button class="btn track-controls-skip-forward" onclick="skipForward()"><img src="./assets/skipforward.png"></button>
+		</div>
+
+		<div class="track-timeline">
+
+			<div class="time-texts">
+				<p id="time-text-1">0:00</p>
+				<p id="time-text-2">0:00</p>
+			</div>
+
+			<span class="track-timeline-back"></span>
+			<input type="range" min="0" max="120" step="0.01" value="0" class="track-timeline-front"/>
+			<span class="track-timeline-handle-visual"></span>
+
+		</div>
+
+	</div>
+
+	<div class="content-container page-settings">
+
+		<div class="page-header">
+			<button class="btn btn-back" onclick="openPage(0)"><img src="./assets/back.png"></button>
+			<h1 class="page-name">Settings</h1>
+		</div>
+
+		<h3 class="settings-param-name">Accent color</h3>
+
+		<div class="settings-param-rowcontainer settings-params-accentcolors">
+			<div class="settings-param-color" onclick="changeAccentColor(1, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(2, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(3, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(4, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(5, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(6, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(7, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(8, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(9, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(10, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(11, this)"></div>
+			<div class="settings-param-color" onclick="changeAccentColor(12, this)"></div>
+		</div>
+
+	</div>
+
+	<div class="content-container page-equalizer">
+
+		<div class="page-header">
+			<button class="btn btn-back" onclick="openPage(0)"><img src="./assets/back.png"></button>
+			<h1 class="page-name">Equalizer</h1>
+			<button class="btn app-button btn-back" onclick="setEQ([0])"><img src="./assets/reset.png"></button>
+		</div>
+
+		<div class="equalizer-bars">
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+			<div class="equalizer-bar">
+				<span class="equalizer-bar-back"></span>
+				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="equalizer-bar-handle-visual"></span>
+			</div>
+
+		</div>
+
+		<div class="equalizer-bar-texts">
+			<p class="equalizer-bar-text">30</p>
+			<p class="equalizer-bar-text">125</p>
+			<p class="equalizer-bar-text">250</p>
+			<p class="equalizer-bar-text">500</p>
+			<p class="equalizer-bar-text">1K</p>
+			<p class="equalizer-bar-text">2K</p>
+			<p class="equalizer-bar-text">4K</p>
+			<p class="equalizer-bar-text">8K</p>
+			<p class="equalizer-bar-text">12K</p>
+			<p class="equalizer-bar-text">16K</p>
+		</div>
+
+		<div class="equalizer-default-values-dots">
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+			<div class="equalizer-default-values-dot"></div>
+		</div>
+
+	</div>
+
+</body>
+
+</html>
+
+<!-- <!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="styles.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Tauri App</title>
+		<script type="module" src="/main.js" defer></script>
+	</head>
+
+	<body>
+		<div class="container">
+			<h1>Welcome to Tauri!</h1>
+
+			<div class="row">
+				<a href="https://tauri.app" target="_blank">
+					<img src="/assets/tauri.svg" class="logo tauri" alt="Tauri logo" />
+				</a>
+				<a
+					href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"
+					target="_blank"
+				>
+					<img
+						src="/assets/javascript.svg"
+						class="logo vanilla"
+						alt="JavaScript logo"
+					/>
+				</a>
+			</div>
+
+			<p>Click on the Tauri logo to learn more about the framework</p>
+
+			<form class="row" id="greet-form">
+				<input id="greet-input" placeholder="Enter a name..." />
+				<button type="submit">Greet</button>
+			</form>
+
+			<p id="greet-msg"></p>
+		</div>
+	</body>
+</html> -->
