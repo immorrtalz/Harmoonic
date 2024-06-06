@@ -5,30 +5,33 @@ use tauri::Manager;
 use window_vibrancy::*;
 use window_shadows::*;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-/* #[tauri::command]
-fn greet(name: &str) -> String
+#[derive(Clone, serde::Serialize)]
+struct Payload
 {
-	format!("Hello, {}! You've been greeted from Rust!", name)
+	args: Vec<String>,
+	cwd: String
 }
- */
 
 fn main()
 {
 	tauri::Builder::default()
+		.plugin(tauri_plugin_single_instance::init(|app, argv, cwd|
+		{
+			app.emit_all("single-instance", Payload { args: argv, cwd }).unwrap();
+		}))
 		.setup(|app|
 		{
 			let window = app.get_window("main").unwrap();
-
-			#[cfg(target_os = "windows")]
-			apply_acrylic(&window, Some((16, 16, 21, 0))).unwrap();
-
-			#[cfg(target_os = "windows")]
 			set_shadow(&window, true).unwrap();
-
 			Ok(())
 		})
-		//.invoke_handler(tauri::generate_handler![greet])
+		.invoke_handler(tauri::generate_handler![winacrylic])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
+}
+
+#[tauri::command]
+fn winacrylic(window: tauri::Window)
+{
+	apply_acrylic(&window, Some((0, 0, 0, 0))).unwrap();
 }

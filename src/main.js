@@ -1,3 +1,31 @@
+const { invoke } = window.__TAURI__.tauri;
+const { getMatches } = window.__TAURI__.cli;
+const { platform, version } = window.__TAURI__.os;
+const { exit } = window.__TAURI__.process;
+const { appWindow, currentMonitor, LogicalPosition } = window.__TAURI__.window;
+
+currentMonitor().then(async (currentMonitorResult) =>
+{
+	const windowScaleFactor = await appWindow.scaleFactor();
+	const windowSize = await appWindow.outerSize();
+	const newWindowPositionX = (currentMonitorResult.size.toLogical(windowScaleFactor).width - windowSize.toLogical(windowScaleFactor).width) / 2;
+	const newWindowPositionY = currentMonitorResult.size.toLogical(windowScaleFactor).height - windowSize.toLogical(windowScaleFactor).height - 47 - 16;
+	appWindow.setPosition(new LogicalPosition(newWindowPositionX, newWindowPositionY));
+});
+
+const isDev = true;
+var useTransparentDesign = false;
+
+platform().then(async (platformResult) =>
+{
+	const isWin = platformResult === 'win32';
+	const OSVersion = await version();
+
+	const sysVer = OSVersion.split('.');
+	useTransparentDesign = isWin && parseInt(sysVer[2], 10) >= 22621;
+	if (useTransparentDesign) invoke("winacrylic", appWindow);
+});
+
 const trackName = document.querySelector(".track-name");
 const trackControlsPause = document.querySelector(".track-controls-pause");
 const timeTexts = document.querySelector(".time-texts");
@@ -9,7 +37,89 @@ const musicPlayer = document.querySelector('#music');
 const equalizerBarFronts = document.querySelectorAll(".equalizer-bar-front");
 const equalizerBarHandles = document.querySelectorAll(".equalizer-bar-handle-visual");
 
+var inputs;
 var settings = 'accentColor 10\neq 0/0/0/0/0/0/0/0/0/0';
+var additionalDataFilePath = "";
+var canTransitionBetweenPages = true;
+
+getMatches().then((matches) =>
+{
+	if (matches.args.length >= 2) additionalDataFilePath = matches.args[1];
+
+	console.log(additionalDataFilePath);
+});
+
+if (!isDev && (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " " || !isExtensionSupported())) exit(0);
+
+function isExtensionSupported()
+{
+	const exts = [ "mp3", "wav", "weba", "webm", "m4a", "ogg", "oga", "caf", "flac", "opus", "mid", "aiff", "wma", "au" ];
+	return exts.includes(additionalDataFilePath.split('.').slice(-1).toString().toLowerCase());
+}
+
+document.addEventListener("DOMContentLoaded", () =>
+{
+	document.getElementById('minimizeAppBtn').addEventListener("click", () => { appWindow.minimize(); });
+	document.getElementById('closeAppBtn').addEventListener("click", () => { exit(0); });
+
+	trackTimelineFront.addEventListener("input", (e) =>
+	{
+		if (!isMusicSourceNull())
+		{
+			musicPlayer.currentTime = e.target.value;
+			if (musicPlayer.duration - musicPlayer.currentTime < 1) musicPlayer.play();
+			setTimelineHandlePosition();
+			setTimeText(1);
+		}
+	});
+	
+	trackTimelineFront.addEventListener("mouseenter", () =>
+	{
+		if (!isMusicSourceNull())
+		{
+			timeTexts.classList.add('time-texts-hovered');
+			timelineHandle.classList.add('track-timeline-handle-visual-hovered');
+		}
+	});
+	
+	trackTimelineFront.addEventListener("mouseleave", () =>
+	{
+		if (!isMusicSourceNull())
+		{
+			timeTexts.classList.remove('time-texts-hovered');
+			timelineHandle.classList.remove('track-timeline-handle-visual-hovered');
+		}
+	});
+
+	musicPlayer.addEventListener('loadeddata', () =>
+	{
+		trackTimelineFront.max = Math.floor(musicPlayer.duration);
+		setTimelineValue();
+		setTimeText(1);
+		setTimeText(2);
+		play(true);
+	});
+	
+	musicPlayer.addEventListener("pause", () =>
+	{
+		pause(true);
+		//window.bridge.sendPlayPauseToMain(musicPlayer.paused);
+	});
+
+	musicPlayer.addEventListener("play", () =>
+	{
+		play(true);
+		//window.bridge.sendPlayPauseToMain(musicPlayer.paused);
+	});
+
+	musicPlayer.addEventListener("ended", () =>
+	{
+		pause(true);
+		//window.bridge.sendPlayPauseToMain(musicPlayer.paused);
+	});
+
+	equalize();
+});
 
 /* window.bridge.sendFilePath((event, filePath) =>
 {
@@ -56,35 +166,6 @@ window.bridge.sendSkipForwardToRenderer((event, data) =>
 	skipForward();
 }); */
 
-trackTimelineFront.addEventListener("input", (e) =>
-{
-	if (!isMusicSourceNull())
-	{
-		musicPlayer.currentTime = e.target.value;
-		if (musicPlayer.duration - musicPlayer.currentTime < 1) musicPlayer.play();
-		setTimelineHandlePosition();
-		setTimeText(1);
-	}
-});
-
-trackTimelineFront.addEventListener("mouseenter", () =>
-{
-	if (!isMusicSourceNull())
-	{
-		timeTexts.classList.add('time-texts-hovered');
-		timelineHandle.classList.add('track-timeline-handle-visual-hovered');
-	}
-});
-
-trackTimelineFront.addEventListener("mouseleave", () =>
-{
-	if (!isMusicSourceNull())
-	{
-		timeTexts.classList.remove('time-texts-hovered');
-		timelineHandle.classList.remove('track-timeline-handle-visual-hovered');
-	}
-});
-
 function setTimelineValue()
 {
 	trackTimelineFront.value = musicPlayer.currentTime;
@@ -97,34 +178,8 @@ function setTimelineHandlePosition()
 	timelineHandle.style.left = handlePosition + 'px';
 }
 
-musicPlayer.addEventListener('loadeddata', () =>
-{
-	trackTimelineFront.max = Math.floor(musicPlayer.duration);
-	setTimelineValue();
-	setTimeText(1);
-	setTimeText(2);
-	play(true);
-});
-
-musicPlayer.addEventListener("pause", (event) => 
-{
-	pause(true);
-	window.bridge.sendPlayPauseToMain(musicPlayer.paused);
-});
-musicPlayer.addEventListener("play", (event) => 
-{
-	play(true);
-	window.bridge.sendPlayPauseToMain(musicPlayer.paused);
-});
-musicPlayer.addEventListener("ended", (event) => 
-{
-	pause(true);
-	window.bridge.sendPlayPauseToMain(musicPlayer.paused);
-});
-
-var context = window.AudioContext;
-//var context = new AudioContext();
-context.sampleRate = 48000 * 2;
+//var context = window.AudioContext;
+var context = new AudioContext();
 var filters;
 const frequencies = [30, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
 
@@ -172,8 +227,6 @@ function equalize()
 		}, false);
 	}
 }
-
-equalize();
 
 function setEqualizerBarHandlePosition(index)
 {
@@ -282,8 +335,6 @@ function setTimeText(index)
 	textElm.textContent = (hours == '0' ? '' : (hours + ":")) + minutes + ":" + seconds;
 }
 
-var canTransitionBetweenPages = true;
-
 function getCurrentPageIndex()
 {
 	const pages = document.querySelectorAll('.content-container');
@@ -328,16 +379,6 @@ function openPage(nextPageIndex)
 	}, 200);
 }
 
-function minimizeApp()
-{
-	window.bridge.minimizeApp();
-}
-
-function closeApp()
-{
-	window.bridge.closeApp();
-}
-
 function changeAccentColor(index, sender, saveToSettings = true)
 {
 	if (1 <= index <= 12)
@@ -378,31 +419,5 @@ function changeSetting(settingIndex, settingValue, saveToSettings = true)
 	if (saveToSettings) window.bridge.sendSettings(settings);
 }
 
-function remap(value, low1, high1, low2, high2)
-{
-	return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
-}
-
-function isMusicSourceNull()
-{
-	return musicPlayer.src === null || musicPlayer.src.trim() == '';
-}
-
-/* const { invoke } = window.__TAURI__.tauri;
-
-let greetInputEl;
-let greetMsgEl;
-
-async function greet() {
-	// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-	greetMsgEl.textContent = await invoke("greet", { name: greetInputEl.value });
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-	greetInputEl = document.querySelector("#greet-input");
-	greetMsgEl = document.querySelector("#greet-msg");
-	document.querySelector("#greet-form").addEventListener("submit", (e) => {
-		e.preventDefault();
-		greet();
-	});
-}); */
+function remap(value, low1, high1, low2, high2) { return low2 + (high2 - low2) * (value - low1) / (high1 - low1); }
+function isMusicSourceNull() { return musicPlayer.src === null || musicPlayer.src.trim() == ''; }
