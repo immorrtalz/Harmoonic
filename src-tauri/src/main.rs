@@ -25,7 +25,7 @@ fn main()
 			set_shadow(&window, true).unwrap();
 			Ok(())
 		})
-		.invoke_handler(tauri::generate_handler![winacrylic])
+		.invoke_handler(tauri::generate_handler![winacrylic, getexepath])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
 }
@@ -34,4 +34,10 @@ fn main()
 fn winacrylic(window: tauri::Window)
 {
 	apply_acrylic(&window, Some((0, 0, 0, 0))).unwrap();
+}
+
+#[tauri::command]
+fn getexepath() -> String
+{
+	std::env::current_exe().unwrap().display().to_string()
 }

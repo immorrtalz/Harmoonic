@@ -10,7 +10,23 @@
 	"tauri": {
 		"cli": {},
 		"allowlist": {
-			"all": true
+			"all": true,
+			"shell": {
+				"scope": [
+					{
+						"name": "use-cmd",
+						"cmd": "cmd",
+						"args": true
+					}
+				]
+			},
+			"fs": {
+				"scope": ["**"]
+			},
+			"protocol": {
+				"asset": true,
+				"assetScope": ["**"]
+			}
 		},
 		"windows": [
 			{
@@ -23,11 +39,12 @@
 				"x": 0,
 				"y": 0,
 				"transparent": true,
-				"decorations": false
+				"decorations": false,
+				"visible": false
 			}
 		],
 		"security": {
-			"csp": null
+			"csp": "asset:"
 		},
 		"bundle": {
 			"active": false,

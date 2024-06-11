@@ -1,30 +1,17 @@
-const { invoke } = window.__TAURI__.tauri;
+const { invoke, convertFileSrc } = window.__TAURI__.tauri;
 const { getMatches } = window.__TAURI__.cli;
 const { platform, version } = window.__TAURI__.os;
 const { exit } = window.__TAURI__.process;
-const { appWindow, currentMonitor, LogicalPosition } = window.__TAURI__.window;
+const { Command } = window.__TAURI__.shell;
+const { appWindow, currentMonitor, PhysicalPosition } = window.__TAURI__.window;
 
-currentMonitor().then(async (currentMonitorResult) =>
-{
-	const windowScaleFactor = await appWindow.scaleFactor();
-	const windowSize = await appWindow.outerSize();
-	const newWindowPositionX = (currentMonitorResult.size.toLogical(windowScaleFactor).width - windowSize.toLogical(windowScaleFactor).width) / 2;
-	const newWindowPositionY = currentMonitorResult.size.toLogical(windowScaleFactor).height - windowSize.toLogical(windowScaleFactor).height - 47 - 16;
-	appWindow.setPosition(new LogicalPosition(newWindowPositionX, newWindowPositionY));
-});
-
+//all variables and constants
 const isDev = true;
-var useTransparentDesign = false;
+const supportedExtensions = [ "mp3", "wav", "weba", "webm", "m4a", "ogg", "oga", "caf", "flac", "opus", "mid", "aiff", "wma", "au" ];
 
-platform().then(async (platformResult) =>
-{
-	const isWin = platformResult === 'win32';
-	const OSVersion = await version();
-
-	const sysVer = OSVersion.split('.');
-	useTransparentDesign = isWin && parseInt(sysVer[2], 10) >= 22621;
-	if (useTransparentDesign) invoke("winacrylic", appWindow);
-});
+var inputs;
+var settings = 'accentColor 10\neq 0/0/0/0/0/0/0/0/0/0';
+var canTransitionBetweenPages = true;
 
 const trackName = document.querySelector(".track-name");
 const trackControlsPause = document.querySelector(".track-controls-pause");
@@ -37,27 +24,68 @@ const musicPlayer = document.querySelector('#music');
 const equalizerBarFronts = document.querySelectorAll(".equalizer-bar-front");
 const equalizerBarHandles = document.querySelectorAll(".equalizer-bar-handle-visual");
 
-var inputs;
-var settings = 'accentColor 10\neq 0/0/0/0/0/0/0/0/0/0';
-var additionalDataFilePath = "";
-var canTransitionBetweenPages = true;
+appWindow.setTitle('Harmoonic');
+musicPlayer.crossOrigin = "anonymous";
 
-getMatches().then((matches) =>
+//set window position to center-bottom while it is invisible
+currentMonitor().then(async (currentMonitorResult) =>
 {
-	if (matches.args.length >= 2) additionalDataFilePath = matches.args[1];
-
-	console.log(additionalDataFilePath);
+	const windowSize = await appWindow.outerSize();
+	const newWindowPositionX = (currentMonitorResult.size.width - windowSize.width) * 0.5;
+	const newWindowPositionY = currentMonitorResult.size.height - windowSize.height - 47 - 16;
+	appWindow.setPosition(new PhysicalPosition(newWindowPositionX, newWindowPositionY));
+	await appWindow.show();
 });
 
-if (!isDev && (additionalDataFilePath == "." || additionalDataFilePath == "" || additionalDataFilePath == " " || !isExtensionSupported())) exit(0);
-
-function isExtensionSupported()
+//make window use acrylic background if it is supported on a current OS version (win11 build >=22621)
+platform().then(async (platformResult) =>
 {
-	const exts = [ "mp3", "wav", "weba", "webm", "m4a", "ogg", "oga", "caf", "flac", "opus", "mid", "aiff", "wma", "au" ];
-	return exts.includes(additionalDataFilePath.split('.').slice(-1).toString().toLowerCase());
+	if (platformResult !== 'win32') return;
+	const OSVersion = await version();
+	const sysVer = OSVersion.split('.');
+	if (parseInt(sysVer[2], 10) >= 22621) invoke("winacrylic", appWindow);
+});
+
+//parse audiofile path from arguments which the app was opened with
+getMatches().then((matches) =>
+{
+	console.log(matches.args);
+
+	if (matches.args.length >= 2)
+	{
+		//const filePath = matches.args[1];
+
+		const filePath = "X:\\Загрузки\\XdrianGM - Memory Wires.mp3";
+
+		if (!isDev && (filePath === "." || filePath === "" || filePath === " " || !isExtensionSupported())) exit(0);
+		else playAudioFile(filePath);
+	}
+
+	//console.log(filePath);
+});
+
+//make audiofiles to open with this app
+async function setAsDefaultAppForExtensions()
+{
+	if (isDev) return;
+
+	for (var i = 0; i < supportedExtensions.length; i++)
+	{
+		const ext = supportedExtensions[i];
+		await new Command('use-cmd', ["/C", `assoc .${ext}=${ext}AudioFile`]).execute();
+		const absoluteAppExePath = await invoke("getexepath");
+		await new Command('use-cmd', ["/C", `ftype ${ext}=${absoluteAppExePath} "%1"`]).execute();
+	}
 }
 
-document.addEventListener("DOMContentLoaded", () =>
+//check if audiofile extension is supported
+function isExtensionSupported()
+{
+	return supportedExtensions.includes(filePathArgument.split('.').slice(-1).toString().toLowerCase());
+}
+
+//when the layout is loaded
+document.addEventListener("DOMContentLoaded", async () =>
 {
 	document.getElementById('minimizeAppBtn').addEventListener("click", () => { appWindow.minimize(); });
 	document.getElementById('closeAppBtn').addEventListener("click", () => { exit(0); });
@@ -70,24 +98,6 @@ document.addEventListener("DOMContentLoaded", () =>
 			if (musicPlayer.duration - musicPlayer.currentTime < 1) musicPlayer.play();
 			setTimelineHandlePosition();
 			setTimeText(1);
-		}
-	});
-	
-	trackTimelineFront.addEventListener("mouseenter", () =>
-	{
-		if (!isMusicSourceNull())
-		{
-			timeTexts.classList.add('time-texts-hovered');
-			timelineHandle.classList.add('track-timeline-handle-visual-hovered');
-		}
-	});
-	
-	trackTimelineFront.addEventListener("mouseleave", () =>
-	{
-		if (!isMusicSourceNull())
-		{
-			timeTexts.classList.remove('time-texts-hovered');
-			timelineHandle.classList.remove('track-timeline-handle-visual-hovered');
 		}
 	});
 
@@ -118,21 +128,23 @@ document.addEventListener("DOMContentLoaded", () =>
 		//window.bridge.sendPlayPauseToMain(musicPlayer.paused);
 	});
 
+	await appWindow.onFocusChanged(({ payload: isFocused }) =>
+	{
+		document.querySelector('.main-gradient').style.opacity = isFocused ? 0.5 : 0.85;
+		const temp = isFocused ? "transparent);" : "var(--clr-background));";
+		document.querySelector('.main-gradient').style.background = "linear-gradient(to top, var(--clr-accent), " + temp;
+	});
+
+	/* addEventListener("single-instance", (result) =>
+	{
+		//focus main window
+		console.log(result);
+	}); */
+
 	equalize();
 });
 
-/* window.bridge.sendFilePath((event, filePath) =>
-{
-	playSelectedFile(filePath);
-});
-
-window.bridge.windowFocused((event, isFocused) =>
-{
-	document.querySelector('.main-gradient').style.opacity = isFocused ? 0.5 : 0.85;
-	const temp = isFocused ? "transparent);" : "var(--clr-background));";
-	document.querySelector('.main-gradient').style.background = "linear-gradient(to top, var(--clr-accent), " + temp;
-});
-
+/*
 window.bridge.sendSettingsToRenderer((event, data) =>
 {
 	if (data !== null && data.trim() != '') settings = data;
@@ -248,9 +260,9 @@ function setEQ(values, saveToSettings = true)
 	changeSetting(1, values.join('/'), saveToSettings);
 }
 
-function playSelectedFile(filePath)
+function playAudioFile(filePath)
 {
-	musicPlayer.src = filePath;
+	musicPlayer.src = convertFileSrc(filePath);
 	play();
 	setTrackNameText(filePath);
 
