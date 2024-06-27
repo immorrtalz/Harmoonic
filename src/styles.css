@@ -469,12 +469,12 @@ body
 .equalizer-bar-text:nth-child(1) { margin-right: 23px; }
 .equalizer-bar-text:nth-child(2) { margin-right: 21px; }
 .equalizer-bar-text:nth-child(3) { margin-right: 20px; }
-.equalizer-bar-text:nth-child(4) { margin-right: 22px; }
-.equalizer-bar-text:nth-child(5) { margin-right: 24px; }
-.equalizer-bar-text:nth-child(6) { margin-right: 24px; }
-.equalizer-bar-text:nth-child(7) { margin-right: 23px; }
-.equalizer-bar-text:nth-child(8) { margin-right: 22px; }
-.equalizer-bar-text:nth-child(9) { margin-right: 20px; }
+.equalizer-bar-text:nth-child(4) { margin-right: 21px; }
+.equalizer-bar-text:nth-child(5) { margin-right: 25px; }
+.equalizer-bar-text:nth-child(6) { margin-right: 23px; }
+.equalizer-bar-text:nth-child(7) { margin-right: 24px; }
+.equalizer-bar-text:nth-child(8) { margin-right: 21px; }
+.equalizer-bar-text:nth-child(9) { margin-right: 21px; }
 
 .page-main { z-index: 0; }
 

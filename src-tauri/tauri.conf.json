@@ -21,6 +21,7 @@
 				]
 			},
 			"fs": {
+				"all": true,
 				"scope": ["**"]
 			},
 			"protocol": {
