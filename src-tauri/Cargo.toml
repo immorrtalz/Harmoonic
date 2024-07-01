@@ -1,0 +1,23 @@
+[package]
+name = "harmoonic"
+version = "0.4.1"
+description = "Simple audio player with modern design"
+authors = ["you"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "1", features = [] }
+
+[dependencies]
+tauri = { version = "1.6.8", features = [ "cli", "api-all"] }
+serde = { version = "1", features = [ "derive" ] }
+serde_json = "1"
+window-vibrancy = "0.4.3"
+window-shadows = "0.2.2"
+tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
+
+[features]
+# This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]

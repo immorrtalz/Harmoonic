@@ -1,0 +1,88 @@
+{
+	"build":
+	{
+		"devPath": "../src",
+		"distDir": "../src",
+		"withGlobalTauri": true
+	},
+	"package":
+	{
+		"productName": "Harmoonic"
+	},
+	"tauri":
+	{
+		"cli":
+		{
+			"args": [
+				{
+					"name": "filePath",
+					"index": 1,
+					"takesValue": true
+				}
+			]
+		},
+		"allowlist":
+		{
+			"all": true,
+			"shell":
+			{
+				"scope": [
+					{
+						"name": "use-cmd",
+						"cmd": "cmd",
+						"args": true
+					},
+					{
+						"name": "use-powershell",
+						"cmd": "powershell",
+						"args": true
+					}
+				]
+			},
+			"fs":
+			{
+				"all": true,
+				"scope": ["**"]
+			},
+			"protocol":
+			{
+				"asset": true,
+				"assetScope": ["**"]
+			}
+		},
+		"windows": [
+			{
+				"label": "main",
+				"width": 400,
+				"height": 200,
+				"resizable": false,
+				"maximizable": false,
+				"fileDropEnabled": false,
+				"x": 0,
+				"y": 0,
+				"transparent": true,
+				"decorations": false,
+				"visible": false
+			}
+		],
+		"security":
+		{
+			"csp": "asset:"
+		},
+		"bundle":
+		{
+			"active": false,
+			"targets": "all",
+			"identifier": "com.EVERMEDIAPROJECT.Harmoonic",
+			"publisher": "EVERMEDIAPROJECT",
+			"icon": [
+				"./icons/icon.ico",
+				"./icons/16x16.ico",
+				"./icons/24x24.ico"
+			],
+			"copyright": "Copyright © 2024 EVERMEDIAPROJECT",
+			"category": "Music",
+			"shortDescription": "Simple audio player with modern design"
+		}
+	}
+}
