@@ -284,7 +284,7 @@ function setTrackNameTextFromFilePath(filePath)
 
 	trackName.textContent = temp_text;
 
-	if (trackName.offsetWidth > trackNameContainer.offsetWidth)
+	if (trackName.offsetWidth > trackNameContainer.offsetWidth - 16)
 	{
 		trackName.textContent = `${temp_text}               ${temp_text}`; //15 spaces
 		const animationLoopTime = Math.floor(trackName.offsetWidth / 80);

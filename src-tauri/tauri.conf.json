@@ -71,8 +71,8 @@
 		},
 		"bundle":
 		{
-			"active": false,
-			"targets": "all",
+			"active": true,
+			"targets": "nsis",
 			"identifier": "com.EVERMEDIAPROJECT.Harmoonic",
 			"publisher": "EVERMEDIAPROJECT",
 			"icon": [
@@ -82,7 +82,11 @@
 			],
 			"copyright": "Copyright © 2024 EVERMEDIAPROJECT",
 			"category": "Music",
-			"shortDescription": "Simple audio player with modern design"
+			"shortDescription": "Simple audio player with modern design",
+			"appimage":
+			{
+				"bundleMediaFramework": true
+			}
 		}
 	}
 }
