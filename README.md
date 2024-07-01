@@ -23,10 +23,10 @@ Open source and Windows only
 > I've already submitted a [feature request](https://github.com/tauri-apps/tauri/issues/10141), so all we can do is wait and hope that they will implement it at all.
 
 > [!WARNING]
-> **To avoid weird behaviour, if you have `...AppData\Local\Programs\Harmoonic` directory, please uninstall old version of the app (it's v0.4.0 and below, made with electron). If you only have `...AppData\Roaming\com.EVERMEDIAPROJECT.Harmoonic` directory, you don't need to do anything**
+> To avoid weird behaviour, if you have `...AppData\Local\Programs\Harmoonic` directory, please uninstall old version of the app (it's v0.4.0 and below, made with electron). If you only have `...AppData\Roaming\com.EVERMEDIAPROJECT.Harmoonic` directory, you don't need to do anything
 
 > [!TIP]
-> **Download the latest release: https://github.com/immorrtalz/Harmoonic/releases/latest**
+> Download the latest release: https://github.com/immorrtalz/Harmoonic/releases/latest
 
 > [!NOTE]
 > The app settings are located in `...AppData\Roaming\com.EVERMEDIAPROJECT.Harmoonic\settings.json`
