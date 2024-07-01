@@ -1,30 +1,51 @@
 {
-	"build": {
+	"build":
+	{
 		"devPath": "../src",
 		"distDir": "../src",
 		"withGlobalTauri": true
 	},
-	"package": {
+	"package":
+	{
 		"productName": "Harmoonic"
 	},
-	"tauri": {
-		"cli": {},
-		"allowlist": {
+	"tauri":
+	{
+		"cli":
+		{
+			"args": [
+				{
+					"name": "filePath",
+					"index": 1,
+					"takesValue": true
+				}
+			]
+		},
+		"allowlist":
+		{
 			"all": true,
-			"shell": {
+			"shell":
+			{
 				"scope": [
 					{
 						"name": "use-cmd",
 						"cmd": "cmd",
 						"args": true
+					},
+					{
+						"name": "use-powershell",
+						"cmd": "powershell",
+						"args": true
 					}
 				]
 			},
-			"fs": {
+			"fs":
+			{
 				"all": true,
 				"scope": ["**"]
 			},
-			"protocol": {
+			"protocol":
+			{
 				"asset": true,
 				"assetScope": ["**"]
 			}
@@ -44,18 +65,20 @@
 				"visible": false
 			}
 		],
-		"security": {
+		"security":
+		{
 			"csp": "asset:"
 		},
-		"bundle": {
+		"bundle":
+		{
 			"active": false,
 			"targets": "all",
 			"identifier": "com.EVERMEDIAPROJECT.Harmoonic",
 			"publisher": "EVERMEDIAPROJECT",
 			"icon": [
-				"./icons/32x32.ico",
+				"./icons/icon.ico",
 				"./icons/16x16.ico",
-				"./icons/256x256.ico"
+				"./icons/24x24.ico"
 			],
 			"copyright": "Copyright © 2024 EVERMEDIAPROJECT",
 			"category": "Music",

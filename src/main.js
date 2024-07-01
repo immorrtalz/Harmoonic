@@ -6,12 +6,14 @@ const { Command } = window.__TAURI__.shell;
 const { appWindow, currentMonitor, PhysicalPosition } = window.__TAURI__.window;
 const { appConfigDir, dataDir } = window.__TAURI__.path;
 const { exists, createDir, readTextFile, writeTextFile } = window.__TAURI__.fs;
+const { message, ask } = window.__TAURI__.dialog;
+const { listen } = window.__TAURI__.event;
 
-//all variables and constants
-const isDev = true;
+const isDev = false;
 const supportedExtensions = [ 'mp3', 'wav', 'weba', 'webm', 'm4a', 'ogg', 'oga', 'caf', 'flac', 'opus', 'mid', 'aiff', 'wma', 'au' ];
 
 const allPages = document.querySelectorAll('.content-container');
+const trackNameContainer = document.querySelector('.track-name-container');
 const trackName = document.querySelector('.track-name');
 const trackControlsPause = document.querySelector('.track-controls-pause');
 const timeTexts = document.querySelector('.time-texts');
@@ -24,11 +26,11 @@ const accentColorButtons = document.querySelectorAll('.settings-param-color');
 const equalizerInputs = document.querySelectorAll('.equalizer-bar-front');
 const equalizerBarHandles = document.querySelectorAll('.equalizer-bar-handle-visual');
 
-//var EQContext = window.AudioContext;
 var EQContext = new AudioContext();
 const EQFrequencies = [30, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
 const EQFilters = EQFrequencies.map(createEQFilter);
 var canTransitionBetweenPages = true;
+var isPlayAfterTimelineValueChange = false;
 
 class Settings
 {
@@ -62,53 +64,90 @@ currentMonitor().then(async (currentMonitorResult) =>
 	const sysVer = OSVersion.split('.');
 	if (parseInt(sysVer[2], 10) >= 22621) invoke('winacrylic', appWindow);
 
-	//parse audiofile path from arguments which the app was opened with
-	const matches = await getMatches();
-	console.log(matches.args);
-	if (matches.args.length >= 2)
+	const matches = await getMatches().catch(() => { exit(0); });
+	const filePath = matches.args.filePath.value;
+
+	if (!isDev) validateFilePath(filePath);
+
+	playAudioFile(matches.args.filePath.value);
+
+	await listen('single-instance', async (event) =>
 	{
-		//const filePath = matches.args[1];
-
-		const filePath = 'X:\\Загрузки\\XdrianGM - Memory Wires.mp3';
-
-		if (!isDev && (filePath === '.' || filePath === '' || filePath === ' ' || !isExtensionSupported())) exit(0);
-		else playAudioFile(filePath);
-	}
-	//console.log(filePath);
+		const eventFilePath = event.payload.args[1];
+		if (!isDev) validateFilePath(eventFilePath);
+		playAudioFile(eventFilePath);
+		await appWindow.setFocus();
+	});
 });
 
+//DOESN'T WORK
 //make audiofiles open with this app
-async function setAsDefaultAppForExtensions()
+/* async function setAsDefaultAppForExtensions()
 {
 	if (isDev) return;
 
-	for (var i = 0; i < supportedExtensions.length; i++)
+	await message('You need to use this setting while running the app as administrator', { type: 'info', okLabel: 'OK' }).then(async () =>
 	{
-		const ext = supportedExtensions[i];
-		await new Command('use-cmd', ['/C', `assoc .${ext}=${ext}AudioFile`]).execute();
-		const absoluteAppExePath = await invoke('getexepath');
-		await new Command('use-cmd', ['/C', `ftype ${ext}=${absoluteAppExePath} %1`]).execute();
-	}
-}
+		await ask("You're about to change your default app for audiofiles. This action cannot be reverted.\nAre you sure?",
+			{ type: 'warning', cancelLabel: 'Wait, no', okLabel: 'Yes, just do it' }).then(async (isContinue) =>
+		{
+			if (!isContinue) return;
+			const absoluteAppExePath = await invoke('getexepath');
+
+			for (var i = 0; i < supportedExtensions.length; i++)
+			{
+				const ext = supportedExtensions[i];
+				//await new Command('use-cmd', ['/C', `ftype ${ext}AudioFile=${absoluteAppExePath} %1`]).execute();
+				const commandArgs = `"ftype","${ext}AudioFile=${absoluteAppExePath}","%1"`;
+				await new Command('use-powershell', ['-Command "Start-Process cmd -ArgumentList ' + commandArgs + ' -Verb RunAs"']);
+				await new Command('use-cmd', ['/C', `assoc .${ext}=${ext}AudioFile`]).execute();
+			}
+
+			await message('Harmoonic is now default app for audiofiles', { type: 'info', okLabel: "OK, that's nice" });
+		});
+	});
+} */
 
 //when the layout is loaded
 document.addEventListener('DOMContentLoaded', async () =>
 {
+	document.addEventListener('contextmenu', event => event.preventDefault());
+
 	await initializeAccentColorButtons();
 	await initializeEQ();
 	await loadSettingsFromFile();
 
+	const backBtns = document.querySelectorAll('#backBtn');
+	for (var i = 0; i < backBtns.length; i++) backBtns[i].addEventListener('click', () => { openPage(0); });
+
+	document.getElementById('openEQBtn').addEventListener('click', () => { openPage(2); });
+	document.getElementById('openSettingsBtn').addEventListener('click', () => { openPage(1); });
 	document.getElementById('minimizeAppBtn').addEventListener('click', () => { appWindow.minimize(); });
 	document.getElementById('closeAppBtn').addEventListener('click', () => { exit(0); });
+	document.getElementById('skipBackBtn').addEventListener('click', () => { skipBack(); });
+	document.getElementById('playPauseBtn').addEventListener('click', () => { playPause(); });
+	document.getElementById('skipForwardBtn').addEventListener('click', () => { skipForward(); });
+	//document.getElementById('setAsDefaultAppForExtensionsBtn').addEventListener('click', () => { setAsDefaultAppForExtensions(); });
+	document.getElementById('resetEQBtn').addEventListener('click', () => { resetEQ(); });
 
 	trackTimelineFront.addEventListener('input', (e) =>
 	{
 		if (!isMusicSourceNull())
 		{
 			musicPlayer.currentTime = e.target.value;
-			if (musicPlayer.duration - musicPlayer.currentTime < 1) musicPlayer.play();
 			setTimelineHandlePosition();
 			setTimeText(1);
+			if (!musicPlayer.paused) isPlayAfterTimelineValueChange = true;
+			musicPlayer.pause();
+		}
+	});
+
+	trackTimelineFront.addEventListener('change', () =>
+	{
+		if (isPlayAfterTimelineValueChange)
+		{
+			isPlayAfterTimelineValueChange = false;
+			musicPlayer.play();
 		}
 	});
 
@@ -118,34 +157,23 @@ document.addEventListener('DOMContentLoaded', async () =>
 		setTimelineValue();
 		setTimeText(1);
 		setTimeText(2);
-		play(true);
+		play();
 	});
 	
-	musicPlayer.addEventListener('pause', () =>
-	{
-		pause(true);
-		//window.bridge.sendPlayPauseToMain(musicPlayer.paused);
-	});
+	musicPlayer.addEventListener('pause', () => { pause(true); });
+	musicPlayer.addEventListener('play', () => { play(true); });
+	musicPlayer.addEventListener('ended', () => { pause(true); });
 
-	musicPlayer.addEventListener('play', () =>
+	setInterval(() =>
 	{
-		play(true);
-		//window.bridge.sendPlayPauseToMain(musicPlayer.paused);
-	});
-
-	musicPlayer.addEventListener('ended', () =>
-	{
-		pause(true);
-		//window.bridge.sendPlayPauseToMain(musicPlayer.paused);
-	});
+		if (!musicPlayer.paused)
+		{
+			setTimelineValue();
+			setTimeText(1);
+		}
+	}, 100);
 
 	await appWindow.onFocusChanged(({ payload: isFocused }) => { document.querySelector('.main-gradient').style.opacity = isFocused ? '0.5' : '0.85'; });
-
-	/* addEventListener('single-instance', (result) =>
-	{
-		//focus main window
-		console.log(result);
-	}); */
 });
 
 async function initializeAccentColorButtons()
@@ -183,22 +211,6 @@ async function initializeEQ()
 	}
 }
 
-/*
-window.bridge.sendPlayPauseToRenderer((event, data) =>
-{
-	playPause(false);
-});
-
-window.bridge.sendSkipBackToRenderer((event, data) =>
-{
-	skipBack();
-});
-
-window.bridge.sendSkipForwardToRenderer((event, data) =>
-{
-	skipForward();
-}); */
-
 function setTimelineValue()
 {
 	trackTimelineFront.value = musicPlayer.currentTime;
@@ -207,28 +219,17 @@ function setTimelineValue()
 
 function setTimelineHandlePosition()
 {
-	const handlePosition = trackTimelineFront.offsetWidth * remap(trackTimelineFront.value, 0, Math.floor(musicPlayer.duration), 0, 1) * 0.975;
-	timelineHandle.style.left = `${handlePosition} px`;
+	const handlePosition = Number(remap(trackTimelineFront.value, 0, trackTimelineFront.max, 0, trackTimelineFront.offsetWidth - 10.4).toFixed(1));
+	timelineHandle.style.left = `${handlePosition}px`;
 }
 
 function playAudioFile(filePath)
 {
 	musicPlayer.src = convertFileSrc(filePath);
-	play();
 	setTrackNameTextFromFilePath(filePath);
-
-	setInterval(() =>
-	{
-		if (!musicPlayer.paused)
-		{
-			setTimelineValue();
-			setTimeText(1);
-			if (musicPlayer.duration - musicPlayer.currentTime <= 1) pause(true);
-		}
-	}, 100);
 }
 
-function playPause(sendToMain = true)
+function playPause()
 {
 	if (!isMusicSourceNull())
 	{
@@ -237,8 +238,6 @@ function playPause(sendToMain = true)
 
 		if (musicPlayer.paused) play();
 		else pause();
-
-		if (sendToMain) window.bridge.sendPlayPauseToMain(musicPlayer.paused);
 	}
 }
 
@@ -254,6 +253,7 @@ function pause(isOnlyVisual = false)
 	if (!isOnlyVisual) musicPlayer.pause();
 }
 
+//skip to the beginning of current track
 function skipBack()
 {
 	if (!isMusicSourceNull())
@@ -264,6 +264,7 @@ function skipBack()
 	}
 }
 
+//skip to the end of current track
 function skipForward()
 {
 	if (!isMusicSourceNull())
@@ -279,10 +280,21 @@ function setTrackNameTextFromFilePath(filePath)
 {
 	const pathSep = filePath.includes('\\') ? '\\' : filePath.includes('/') ? '/' : '';
 	const splitPath = filePath.split(pathSep);
-	trackName.textContent = pathSep !== '' ? splitPath[splitPath.length - 1] : filePath;
+	const temp_text = pathSep !== '' ? splitPath[splitPath.length - 1] : filePath;
+
+	trackName.textContent = temp_text;
+
+	if (trackName.offsetWidth > trackNameContainer.offsetWidth)
+	{
+		trackName.textContent = `${temp_text}               ${temp_text}`; //15 spaces
+		const animationLoopTime = Math.floor(trackName.offsetWidth / 80);
+		trackName.style.animation = `scroll-text-animation ${animationLoopTime}s cubic-bezier(0.3, 0, 0.7, 0.7) infinite`;
+		setTimeout(() => { trackName.style.animation = `scroll-text-animation ${animationLoopTime}s linear infinite`; }, animationLoopTime * 1000);
+	}
+	else trackName.style.removeProperty('animation');
 }
 
-//set time texts' contents
+//set one of time texts' content
 function setTimeText(index)
 {
 	const time = index == 1 ? musicPlayer.currentTime : musicPlayer.duration;
@@ -328,6 +340,7 @@ function openPage(nextPageIndex)
 	}, 200);
 }
 
+//get index of page which is user currently on
 function getCurrentPageIndex()
 {
 	for (var i = 0; i < allPages.length; i++) { if (parseFloat(allPages[i].style.opacity) > 0.9) return i; }
@@ -342,25 +355,32 @@ function changeAccentColor()
 		accentColorButtons[i].style.outline = '2px solid ' + (i == settings.accentColor - 1 ? 'rgba(255, 255, 255, 1)' : 'var(--clr-white-transparent-50)');
 }
 
+//change value of one of EQ bars
 function changeEQ(inputIndex, isManualInput = true)
 {
 	EQFilters[inputIndex].gain.value = settings.eq[inputIndex];
 	if (!isManualInput) equalizerInputs[inputIndex].value = -settings.eq[inputIndex]; //invert cuz sliders are actually upside down
-	const handlePosition = Number(remap(equalizerInputs[inputIndex].value, equalizerInputs[inputIndex].min, equalizerInputs[inputIndex].max, 0, 96.2).toFixed(1));
+	const handlePosition = Number(remap(equalizerInputs[inputIndex].value, equalizerInputs[inputIndex].min, equalizerInputs[inputIndex].max, 0, 86).toFixed(1));
 	equalizerBarHandles[inputIndex].style.top = `${handlePosition}px`;
 }
 
-function resetEQ()
+//reset EQ to default
+async function resetEQ()
 {
-	settings.resetEQ();
-	for (var i = 0; i < equalizerInputs.length; i++) changeEQ(i, false);
-	saveSettingsToFile();
+	await ask("You're about to reset your EQ settings. This action cannot be reverted.\nAre you sure?",
+		{ type: 'warning', cancelLabel: 'Wait, no', okLabel: 'Yes, just do it' }).then((isContinue) =>
+	{
+		if (!isContinue) return;
+		settings.resetEQ();
+		for (var i = 0; i < equalizerInputs.length; i++) changeEQ(i, false);
+		saveSettingsToFile();
+	});
 }
 
 async function loadSettingsFromFile()
 {
 	const appConfigDirPath = await appConfigDir();
-	settingsFilePath = `${appConfigDirPath}settings.txt`;
+	settingsFilePath = `${appConfigDirPath}settings.json`;
 	const settingsFileExists = await exists(settingsFilePath);
 
 	if (settingsFileExists) await readTextFile(settingsFilePath).then((settingsFileContent) => { Object.assign(settings, JSON.parse(settingsFileContent)); });
@@ -389,6 +409,7 @@ function createEQFilter(frequency)
 	return filter;
 }
 
-function isExtensionSupported() { return supportedExtensions.includes(filePathArgument.split('.').slice(-1).toString().toLowerCase()); }
+function validateFilePath(filePath) { if (filePath === undefined || filePath === null || filePath === '' || filePath === ' ' || !isExtensionSupported(filePath)) exit(0); }
+function isExtensionSupported(filePath) { return supportedExtensions.includes(filePath.split('.').slice(-1).toString().toLowerCase()); }
 function isMusicSourceNull() { return musicPlayer.src === null || musicPlayer.src.trim() == ''; }
 function remap(value, low1, high1, low2, high2) { return low2 + (high2 - low2) * (value - low1) / (high1 - low1); }

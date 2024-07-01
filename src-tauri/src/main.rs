@@ -27,7 +27,7 @@ fn main()
 		})
 		.invoke_handler(tauri::generate_handler![winacrylic, getexepath])
 		.run(tauri::generate_context!())
-		.expect("error while running tauri application");
+		.expect("Error occured while running this application");
 }
 
 #[tauri::command]

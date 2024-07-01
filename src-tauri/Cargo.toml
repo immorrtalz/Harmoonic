@@ -12,7 +12,7 @@ tauri-build = { version = "1", features = [] }
 
 [dependencies]
 tauri = { version = "1.6.8", features = [ "cli", "api-all"] }
-serde = { version = "1", features = ["derive"] }
+serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"
 window-vibrancy = "0.4.3"
 window-shadows = "0.2.2"
