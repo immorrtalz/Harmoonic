@@ -2,16 +2,16 @@ const { invoke, convertFileSrc } = window.__TAURI__.tauri;
 const { getMatches } = window.__TAURI__.cli;
 const { platform, version } = window.__TAURI__.os;
 const { exit } = window.__TAURI__.process;
-const { Command } = window.__TAURI__.shell;
 const { appWindow, currentMonitor, PhysicalPosition } = window.__TAURI__.window;
 const { appConfigDir, dataDir } = window.__TAURI__.path;
 const { exists, createDir, readTextFile, writeTextFile } = window.__TAURI__.fs;
-const { message, ask } = window.__TAURI__.dialog;
+const { message, ask, open } = window.__TAURI__.dialog;
 const { listen } = window.__TAURI__.event;
 
-const isDev = false;
+const isDev = true;
 const supportedExtensions = [ 'mp3', 'wav', 'weba', 'webm', 'm4a', 'ogg', 'oga', 'caf', 'flac', 'opus', 'mid', 'aiff', 'wma', 'au' ];
 
+const mainGradient = document.querySelector('.main-gradient');
 const allPages = document.querySelectorAll('.content-container');
 const trackNameContainer = document.querySelector('.track-name-container');
 const trackName = document.querySelector('.track-name');
@@ -25,16 +25,19 @@ const musicPlayer = document.querySelector('#music');
 const accentColorButtons = document.querySelectorAll('.settings-param-color');
 const equalizerInputs = document.querySelectorAll('.equalizer-bar-front');
 const equalizerBarHandles = document.querySelectorAll('.equalizer-bar-handle-visual');
+const playlistTracksContainer = document.getElementById('playlistTracksContainer');
 
+const playlist = [];
 var EQContext = new AudioContext();
 const EQFrequencies = [30, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
 const EQFilters = EQFrequencies.map(createEQFilter);
 var canTransitionBetweenPages = true;
 var isPlayAfterTimelineValueChange = false;
+var trackNameScrollTimeoutId;
 
 class Settings
 {
-	accentColor = 10;
+	accentColor = 16;
 	eq;
 
 	constructor() { this.resetEQ(); }
@@ -62,51 +65,41 @@ currentMonitor().then(async (currentMonitorResult) =>
 	if (platformResult !== 'win32') return;
 	const OSVersion = await version();
 	const sysVer = OSVersion.split('.');
-	if (parseInt(sysVer[2], 10) >= 22621) invoke('winacrylic', appWindow);
+
+	if (parseInt(sysVer[2], 10) >= 22621)
+	{
+		invoke('winacrylic', appWindow);
+		await appWindow.onFocusChanged(({ payload: isFocused }) => { mainGradient.style.opacity = isFocused ? '0.5' : '0.85'; });
+	}
+	else mainGradient.style.opacity = '1';
 
 	const matches = await getMatches().catch(() => { exit(0); });
 	const filePath = matches.args.filePath.value;
 
-	if (!isDev) validateFilePath(filePath);
-
-	playAudioFile(matches.args.filePath.value);
+	if (!isDev) await validateFilePath(filePath);
+	playlist.push(filePath);
+	playAudioFile(playlist[0]);
 
 	await listen('single-instance', async (event) =>
 	{
 		const eventFilePath = event.payload.args[1];
-		if (!isDev) validateFilePath(eventFilePath);
-		playAudioFile(eventFilePath);
+		if (isFilePathOK(eventFilePath)) addAudioFileToPlaylist(eventFilePath);
+		
+		await appWindow.unminimize();
 		await appWindow.setFocus();
 	});
-});
 
-//DOESN'T WORK
-//make audiofiles open with this app
-/* async function setAsDefaultAppForExtensions()
-{
-	if (isDev) return;
-
-	await message('You need to use this setting while running the app as administrator', { type: 'info', okLabel: 'OK' }).then(async () =>
+	await listen('tauri://file-drop', async (event) =>
 	{
-		await ask("You're about to change your default app for audiofiles. This action cannot be reverted.\nAre you sure?",
-			{ type: 'warning', cancelLabel: 'Wait, no', okLabel: 'Yes, just do it' }).then(async (isContinue) =>
+		const eventFilePaths = event.payload;
+
+		for (var i = 0; i < eventFilePaths.length; i++)
 		{
-			if (!isContinue) return;
-			const absoluteAppExePath = await invoke('getexepath');
-
-			for (var i = 0; i < supportedExtensions.length; i++)
-			{
-				const ext = supportedExtensions[i];
-				//await new Command('use-cmd', ['/C', `ftype ${ext}AudioFile=${absoluteAppExePath} %1`]).execute();
-				const commandArgs = `"ftype","${ext}AudioFile=${absoluteAppExePath}","%1"`;
-				await new Command('use-powershell', ['-Command "Start-Process cmd -ArgumentList ' + commandArgs + ' -Verb RunAs"']);
-				await new Command('use-cmd', ['/C', `assoc .${ext}=${ext}AudioFile`]).execute();
-			}
-
-			await message('Harmoonic is now default app for audiofiles', { type: 'info', okLabel: "OK, that's nice" });
-		});
+			if (isFilePathOK(eventFilePaths[i])) addAudioFileToPlaylist(eventFilePaths[i]);
+		}
+		console.log(playlist);
 	});
-} */
+});
 
 //when the layout is loaded
 document.addEventListener('DOMContentLoaded', async () =>
@@ -117,9 +110,10 @@ document.addEventListener('DOMContentLoaded', async () =>
 	await initializeEQ();
 	await loadSettingsFromFile();
 
-	const backBtns = document.querySelectorAll('#backBtn');
+	const backBtns = document.querySelectorAll('.backBtn');
 	for (var i = 0; i < backBtns.length; i++) backBtns[i].addEventListener('click', () => { openPage(0); });
 
+	document.getElementById('openPlaylistBtn').addEventListener('click', () => { openPage(3); });
 	document.getElementById('openEQBtn').addEventListener('click', () => { openPage(2); });
 	document.getElementById('openSettingsBtn').addEventListener('click', () => { openPage(1); });
 	document.getElementById('minimizeAppBtn').addEventListener('click', () => { appWindow.minimize(); });
@@ -127,8 +121,8 @@ document.addEventListener('DOMContentLoaded', async () =>
 	document.getElementById('skipBackBtn').addEventListener('click', () => { skipBack(); });
 	document.getElementById('playPauseBtn').addEventListener('click', () => { playPause(); });
 	document.getElementById('skipForwardBtn').addEventListener('click', () => { skipForward(); });
-	//document.getElementById('setAsDefaultAppForExtensionsBtn').addEventListener('click', () => { setAsDefaultAppForExtensions(); });
 	document.getElementById('resetEQBtn').addEventListener('click', () => { resetEQ(); });
+	document.getElementById('addAudioFileToPlaylistBtn').addEventListener('click', () => { addAudioFilesToPlaylistViaOpenFile(); });
 
 	trackTimelineFront.addEventListener('input', (e) =>
 	{
@@ -153,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 
 	musicPlayer.addEventListener('loadeddata', () =>
 	{
-		trackTimelineFront.max = Math.floor(musicPlayer.duration);
+		trackTimelineFront.max = Number(musicPlayer.duration.toFixed(2));
 		setTimelineValue();
 		setTimeText(1);
 		setTimeText(2);
@@ -162,24 +156,30 @@ document.addEventListener('DOMContentLoaded', async () =>
 	
 	musicPlayer.addEventListener('pause', () => { pause(true); });
 	musicPlayer.addEventListener('play', () => { play(true); });
-	musicPlayer.addEventListener('ended', () => { pause(true); });
-
-	setInterval(() =>
+	musicPlayer.addEventListener('ended', () =>
 	{
-		if (!musicPlayer.paused)
-		{
-			setTimelineValue();
-			setTimeText(1);
-		}
-	}, 100);
+		if (playlist.length == 1) pause(true);
+		setTimelineValue();
+		setTimeText(1);
 
-	await appWindow.onFocusChanged(({ payload: isFocused }) => { document.querySelector('.main-gradient').style.opacity = isFocused ? '0.5' : '0.85'; });
+		if (playlist.length > 1)
+		{
+			playAudioFile(playlist[1]);
+			playlist.splice(0, 1);
+			document.querySelector('.playlist-track').remove();
+		}
+	});
+
+	setInterval(() => { if (!musicPlayer.paused) setTimelineValue(); }, 50);
+	setInterval(() => { if (!musicPlayer.paused) setTimeText(1); }, 100);
 });
 
 async function initializeAccentColorButtons()
 {
 	for (var i = 0; i < accentColorButtons.length; i++)
 	{
+		accentColorButtons[i].style.background = `hsl(${18 * i}, 100%, 61%)`;
+
 		accentColorButtons[i].addEventListener('click', (event) =>
 		{
 			settings.accentColor = Array.from(event.target.parentElement.children).indexOf(event.target) + 1;
@@ -229,6 +229,64 @@ function playAudioFile(filePath)
 	setTrackNameTextFromFilePath(filePath);
 }
 
+function addAudioFileToPlaylist(filePath)
+{
+	playlist.push(filePath);
+
+	const temp_text = getTrackNameTextFromFilePath(filePath);
+
+	playlistTracksContainer.insertAdjacentHTML('beforeend',
+	`<div class="playlist-track">
+		<div class="playlist-track-drag-handle"><img src="./assets/draghandle.png"></div>
+		<div class="playlist-track-name-container"><p class="playlist-track-name">${temp_text}</p></div>
+		<button class="btn btn-square playlistTrackRemoveBtn"><img src="./assets/delete.png"></button>
+	</div>`);
+
+	/* const playlistTrackNames = document.querySelectorAll('.playlist-track-name')
+	const playlistTrackName = playlistTrackNames[playlistTrackNames.length - 1];
+
+	if (playlistTrackName.offsetWidth > 263 - 32)
+	{
+		playlistTrackName.textContent = `${temp_text}               ${temp_text}`; //15 spaces
+		const animationLoopTime = Math.floor(playlistTrackName.offsetWidth / 80);
+		playlistTrackName.style.setProperty('--animationLoopTime', `${animationLoopTime}s`);
+	} */
+
+	const elements = document.querySelectorAll('.playlistTrackRemoveBtn');
+	const element = elements[elements.length - 1];
+	element.addEventListener('click', () =>
+	{
+		const index = Array.from(element.parentElement.parentElement.children).indexOf(element.parentElement);
+		if (index == 0)
+		{
+			if (playlist.length > 1) skipForward();
+			else exit(0);
+		}
+		playlist.splice(index, 1);
+		element.parentElement.remove();
+	});
+}
+
+async function addAudioFilesToPlaylistViaOpenFile()
+{
+	const selected = await open(
+	{
+		directory: false,
+		multiple: true,
+		filters: [ { name: 'All Files', extensions: supportedExtensions }],
+		title: 'Select audiofiles to add them to the playlist'
+	});
+
+	if (selected !== null)
+	{
+		if (Array.isArray(selected))
+		{
+			for (var i = 0; i < selected.length; i++) addAudioFileToPlaylist(selected[i]);
+		}
+		else addAudioFileToPlaylist(selected);
+	}
+}
+
 function playPause()
 {
 	if (!isMusicSourceNull())
@@ -273,26 +331,28 @@ function skipForward()
 		if (musicPlayer.duration - musicPlayer.currentTime < 1) musicPlayer.play();
 		setTimelineValue();
 		setTimeText(1);
+		playAudioFile(playlist[1]);
 	}
 }
 
 function setTrackNameTextFromFilePath(filePath)
 {
-	const pathSep = filePath.includes('\\') ? '\\' : filePath.includes('/') ? '/' : '';
-	const splitPath = filePath.split(pathSep);
-	const temp_text = pathSep !== '' ? splitPath[splitPath.length - 1] : filePath;
+	const temp_text = getTrackNameTextFromFilePath(filePath);
 
 	trackName.textContent = temp_text;
+	trackName.style.removeProperty('animation');
+	clearTimeout(trackNameScrollTimeoutId);
 
-	if (trackName.offsetWidth > trackNameContainer.offsetWidth - 16)
+	if (trackName.offsetWidth > trackNameContainer.offsetWidth - 32)
 	{
 		trackName.textContent = `${temp_text}               ${temp_text}`; //15 spaces
 		const animationLoopTime = Math.floor(trackName.offsetWidth / 80);
-		trackName.style.animation = `scroll-text-animation ${animationLoopTime}s cubic-bezier(0.3, 0, 0.7, 0.7) infinite`;
-		setTimeout(() => { trackName.style.animation = `scroll-text-animation ${animationLoopTime}s linear infinite`; }, animationLoopTime * 1000);
+		trackName.style.animation = `scroll-track-name-animation ${animationLoopTime}s cubic-bezier(0.3, 0, 0.7, 0.7) infinite`;
+		trackNameScrollTimeoutId = setTimeout(() => { trackName.style.animation = `scroll-track-name-animation ${animationLoopTime}s linear infinite`; }, animationLoopTime * 1000);
 	}
-	else trackName.style.removeProperty('animation');
 }
+
+function getTrackNameTextFromFilePath(filePath) { return isDev ? filePath : filePath.split('\\')[splitPath.length - 1]; }
 
 //set one of time texts' content
 function setTimeText(index)
@@ -318,7 +378,7 @@ function openPage(nextPageIndex)
 	if (prevPageIndex == nextPageIndex) return;
 	canTransitionBetweenPages = false;
 
-	const pageNames = ['main', 'settings', 'equalizer'];
+	const pageNames = ['main', 'settings', 'equalizer', 'playlist'];
 
 	const prevPage = document.querySelector(`.page-${pageNames[prevPageIndex]}`);
 	const nextPage = document.querySelector(`.page-${pageNames[nextPageIndex]}`);
@@ -349,7 +409,7 @@ function getCurrentPageIndex()
 
 function changeAccentColor()
 {
-	document.documentElement.style.setProperty('--clr-accent', `var(--clr-template-${settings.accentColor})`);
+	document.documentElement.style.setProperty('--clr-accent', `hsl(${18 * (settings.accentColor - 1)}, 100%, 61%)`);
 
 	for (var i = 0; i < accentColorButtons.length; i++)
 		accentColorButtons[i].style.outline = '2px solid ' + (i == settings.accentColor - 1 ? 'rgba(255, 255, 255, 1)' : 'var(--clr-white-transparent-50)');
@@ -409,7 +469,8 @@ function createEQFilter(frequency)
 	return filter;
 }
 
-function validateFilePath(filePath) { if (filePath === undefined || filePath === null || filePath === '' || filePath === ' ' || !isExtensionSupported(filePath)) exit(0); }
-function isExtensionSupported(filePath) { return supportedExtensions.includes(filePath.split('.').slice(-1).toString().toLowerCase()); }
+function validateFilePath(filePath) { if (!isFilePathOK(filePath)) exit(0); }
+function isFilePathOK(filePath) { return filePath !== undefined && filePath !== null && filePath !== false && filePath !== '' && filePath !== ' ' || isExtensionSupported(filePath) }
+function isExtensionSupported(filePath) { return filePath === null ? true : supportedExtensions.includes(filePath.split('.').slice(-1).toString().toLowerCase()); }
 function isMusicSourceNull() { return musicPlayer.src === null || musicPlayer.src.trim() == ''; }
 function remap(value, low1, high1, low2, high2) { return low2 + (high2 - low2) * (value - low1) / (high1 - low1); }

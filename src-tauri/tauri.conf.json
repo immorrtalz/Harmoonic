@@ -57,7 +57,7 @@
 				"height": 200,
 				"resizable": false,
 				"maximizable": false,
-				"fileDropEnabled": false,
+				"fileDropEnabled": true,
 				"x": 0,
 				"y": 0,
 				"transparent": true,
@@ -74,13 +74,13 @@
 			"active": true,
 			"targets": "nsis",
 			"identifier": "com.EVERMEDIAPROJECT.Harmoonic",
-			"publisher": "EVERMEDIAPROJECT",
+			"publisher": "EVERMEDIA PROJECT",
 			"icon": [
 				"./icons/icon.ico",
 				"./icons/16x16.ico",
 				"./icons/24x24.ico"
 			],
-			"copyright": "Copyright © 2024 EVERMEDIAPROJECT",
+			"copyright": "Copyright © 2024 EVERMEDIA PROJECT",
 			"category": "Music",
 			"shortDescription": "Simple audio player with modern design",
 			"appimage":

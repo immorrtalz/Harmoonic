@@ -15,6 +15,7 @@
 	<div class="top-buttons">
 
 		<div class="app-buttons">
+			<button class="btn app-button" id="openPlaylistBtn"><img src="./assets/playlist.png"></button>
 			<button class="btn app-button" id="openEQBtn"><img src="./assets/eq.png"></button>
 			<button class="btn app-button" id="openSettingsBtn"><img src="./assets/settings.png"></button>
 		</div>
@@ -58,11 +59,11 @@
 	<div class="content-container page-settings">
 
 		<div class="page-header">
-			<button class="btn btn-square" id="backBtn"><img src="./assets/back.png"></button>
+			<button class="btn btn-square backBtn"><img src="./assets/back.png"></button>
 			<h1 class="page-name">Settings</h1>
 		</div>
 
-		<div class="settings-params-container">
+		<div class="page-scroll-container">
 
 			<h3 class="settings-param-name">Accent color</h3>
 			<div class="settings-param-rowcontainer settings-params-accentcolors">
@@ -78,10 +79,18 @@
 				<div class="settings-param-color"></div>
 				<div class="settings-param-color"></div>
 				<div class="settings-param-color"></div>
+				<div class="settings-param-color"></div>
+				<div class="settings-param-color"></div>
+				<div class="settings-param-color"></div>
+				<div class="settings-param-color"></div>
+				<div class="settings-param-color"></div>
+				<div class="settings-param-color"></div>
+				<div class="settings-param-color"></div>
+				<div class="settings-param-color"></div>
 			</div>
 
-			<!-- <h3 class="settings-param-name settings-param-name-inline">File associations</h3>
-			<button class="btn settings-param-inline" id="setAsDefaultAppForExtensionsBtn"><p>Set</p></button> -->
+			<!-- <h3 class="settings-param-name settings-param-name-inline">Text</h3>
+			<button class="btn settings-param-inline" id=""><p>Text</p></button> -->
 
 		</div>
 	</div>
@@ -89,7 +98,7 @@
 	<div class="content-container page-equalizer">
 
 		<div class="page-header">
-			<button class="btn btn-square" id="backBtn"><img src="./assets/back.png"></button>
+			<button class="btn btn-square backBtn"><img src="./assets/back.png"></button>
 			<h1 class="page-name">Equalizer</h1>
 			<button class="btn btn-square page-header-right-aligned-btn" id="resetEQBtn"><img src="./assets/reset.png"></button>
 		</div>
@@ -184,6 +193,18 @@
 			<div class="equalizer-default-values-dot"></div>
 			<div class="equalizer-default-values-dot"></div>
 		</div>
+
+	</div>
+
+	<div class="content-container page-playlist">
+
+		<div class="page-header">
+			<button class="btn btn-square backBtn"><img src="./assets/back.png"></button>
+			<h1 class="page-name">Playlist</h1>
+			<button class="btn btn-square page-header-right-aligned-btn" id="addAudioFileToPlaylistBtn"><img src="./assets/plus.png"></button>
+		</div>
+
+		<div class="page-scroll-container" id="playlistTracksContainer"></div>
 
 	</div>
 
