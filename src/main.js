@@ -8,7 +8,7 @@ const { exists, createDir, readTextFile, writeTextFile } = window.__TAURI__.fs;
 const { message, ask, open } = window.__TAURI__.dialog;
 const { listen } = window.__TAURI__.event;
 
-const isDev = true;
+const isDev = false;
 const supportedExtensions = [ 'mp3', 'wav', 'weba', 'webm', 'm4a', 'ogg', 'oga', 'caf', 'flac', 'opus', 'mid', 'aiff', 'wma', 'au' ];
 
 const mainGradient = document.querySelector('.main-gradient');
@@ -27,13 +27,15 @@ const equalizerInputs = document.querySelectorAll('.equalizer-bar-front');
 const equalizerBarHandles = document.querySelectorAll('.equalizer-bar-handle-visual');
 const playlistTracksContainer = document.getElementById('playlistTracksContainer');
 
-const playlist = [];
+var playlist = [];
 var EQContext = new AudioContext();
 const EQFrequencies = [30, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
 const EQFilters = EQFrequencies.map(createEQFilter);
 var canTransitionBetweenPages = true;
 var isPlayAfterTimelineValueChange = false;
 var trackNameScrollTimeoutId;
+var playlistTrackDragOverIntervalId;
+var mousePosition;
 
 class Settings
 {
@@ -77,13 +79,19 @@ currentMonitor().then(async (currentMonitorResult) =>
 	const filePath = matches.args.filePath.value;
 
 	if (!isDev) await validateFilePath(filePath);
-	playlist.push(filePath);
+	addAudioFileToPlaylist(filePath);
 	playAudioFile(playlist[0]);
 
 	await listen('single-instance', async (event) =>
 	{
 		const eventFilePath = event.payload.args[1];
-		if (isFilePathOK(eventFilePath)) addAudioFileToPlaylist(eventFilePath);
+
+		if (isFilePathOK(eventFilePath))
+		{
+			clearPlaylist();
+			addAudioFileToPlaylist(eventFilePath);
+			playAudioFile(playlist[0]);
+		}
 		
 		await appWindow.unminimize();
 		await appWindow.setFocus();
@@ -97,14 +105,13 @@ currentMonitor().then(async (currentMonitorResult) =>
 		{
 			if (isFilePathOK(eventFilePaths[i])) addAudioFileToPlaylist(eventFilePaths[i]);
 		}
-		console.log(playlist);
 	});
 });
 
 //when the layout is loaded
 document.addEventListener('DOMContentLoaded', async () =>
 {
-	document.addEventListener('contextmenu', event => event.preventDefault());
+	document.addEventListener('contextmenu', (event) => event.preventDefault());
 
 	await initializeAccentColorButtons();
 	await initializeEQ();
@@ -158,16 +165,10 @@ document.addEventListener('DOMContentLoaded', async () =>
 	musicPlayer.addEventListener('play', () => { play(true); });
 	musicPlayer.addEventListener('ended', () =>
 	{
-		if (playlist.length == 1) pause(true);
 		setTimelineValue();
 		setTimeText(1);
-
-		if (playlist.length > 1)
-		{
-			playAudioFile(playlist[1]);
-			playlist.splice(0, 1);
-			document.querySelector('.playlist-track').remove();
-		}
+		if (playlist.length == 1) pause(true);
+		else skipForward();
 	});
 
 	setInterval(() => { if (!musicPlayer.paused) setTimelineValue(); }, 50);
@@ -226,45 +227,65 @@ function setTimelineHandlePosition()
 function playAudioFile(filePath)
 {
 	musicPlayer.src = convertFileSrc(filePath);
-	setTrackNameTextFromFilePath(filePath);
+	setTrackNameText(filePath);
+}
+
+function clearPlaylist()
+{
+	playlist = [];
+	playlistTracksContainer.innerHTML = "";
 }
 
 function addAudioFileToPlaylist(filePath)
 {
 	playlist.push(filePath);
-
-	const temp_text = getTrackNameTextFromFilePath(filePath);
+	const text = getTrackNameTextFromFilePath(filePath);
 
 	playlistTracksContainer.insertAdjacentHTML('beforeend',
 	`<div class="playlist-track">
-		<div class="playlist-track-drag-handle"><img src="./assets/draghandle.png"></div>
-		<div class="playlist-track-name-container"><p class="playlist-track-name">${temp_text}</p></div>
+		<div class="playlist-track-move-arrows"><img src="./assets/listarrowup.png"><img src="./assets/listarrowup.png"></div>
+		<div class="playlist-track-name-container"><p class="playlist-track-name">${text}</p></div>
 		<button class="btn btn-square playlistTrackRemoveBtn"><img src="./assets/delete.png"></button>
 	</div>`);
 
-	/* const playlistTrackNames = document.querySelectorAll('.playlist-track-name')
-	const playlistTrackName = playlistTrackNames[playlistTrackNames.length - 1];
+	const playlistTrack = playlistTracksContainer.children[playlistTracksContainer.children.length - 1];
 
-	if (playlistTrackName.offsetWidth > 263 - 32)
-	{
-		playlistTrackName.textContent = `${temp_text}               ${temp_text}`; //15 spaces
-		const animationLoopTime = Math.floor(playlistTrackName.offsetWidth / 80);
-		playlistTrackName.style.setProperty('--animationLoopTime', `${animationLoopTime}s`);
-	} */
+	const playlistTrackNameText = playlistTrack.querySelector('.playlist-track-name');
+	setTextScrolling(playlistTrackNameText, playlistTrackNameText.parentElement.offsetWidth, text);
 
-	const elements = document.querySelectorAll('.playlistTrackRemoveBtn');
-	const element = elements[elements.length - 1];
-	element.addEventListener('click', () =>
+	playlistTrack.querySelector('.playlistTrackRemoveBtn').addEventListener('click', (event) =>
 	{
-		const index = Array.from(element.parentElement.parentElement.children).indexOf(element.parentElement);
-		if (index == 0)
-		{
-			if (playlist.length > 1) skipForward();
-			else exit(0);
-		}
-		playlist.splice(index, 1);
-		element.parentElement.remove();
+		removeAudioFileFromPlaylist(Array.from(event.target.parentElement.parentElement.children).indexOf(event.target.parentElement));
 	});
+
+	const moveTrackArrows = playlistTrack.querySelector('.playlist-track-move-arrows').children;
+	
+	for (var i = 0; i < moveTrackArrows.length; i++)
+	{
+		moveTrackArrows[i].addEventListener('click', (event) =>
+		{
+			var targetArrowIndex = Array.from(event.target.parentElement.children).indexOf(event.target);
+			if (targetArrowIndex == 0) targetArrowIndex = -1;
+			const targetTrackIndex = Array.from(playlistTracksContainer.children).indexOf(event.target.parentElement.parentElement);
+			const targetTrackFromPlaylist = playlist[targetTrackIndex];
+
+			playlist[targetTrackIndex] = playlist[targetTrackIndex + targetArrowIndex];
+			playlist[targetTrackIndex + targetArrowIndex] = targetTrackFromPlaylist;
+			if (targetArrowIndex == 1) targetArrowIndex = 2;
+			playlistTracksContainer.insertBefore(playlistTracksContainer.children[targetTrackIndex], playlistTracksContainer.children[targetTrackIndex + targetArrowIndex]);
+		});
+	}
+}
+
+function removeAudioFileFromPlaylist(index)
+{
+	if (index == 0)
+	{
+		if (playlist.length == 1) exit(0);
+		//skipForward();
+	}
+	playlist.splice(index, 1);
+	playlistTracksContainer.children[index].remove();
 }
 
 async function addAudioFilesToPlaylistViaOpenFile()
@@ -327,32 +348,60 @@ function skipForward()
 {
 	if (!isMusicSourceNull())
 	{
-		musicPlayer.currentTime = musicPlayer.duration;
-		if (musicPlayer.duration - musicPlayer.currentTime < 1) musicPlayer.play();
+		if (!musicPlayer.ended)
+		{
+			musicPlayer.currentTime = musicPlayer.duration;
+			pause(true);
+		}
+
 		setTimelineValue();
 		setTimeText(1);
-		playAudioFile(playlist[1]);
+
+		if (playlist.length > 1)
+		{
+			playAudioFile(playlist[1]);
+			removeAudioFileFromPlaylist(0);
+		}
 	}
 }
 
-function setTrackNameTextFromFilePath(filePath)
+function setTrackNameText(filePath)
 {
-	const temp_text = getTrackNameTextFromFilePath(filePath);
+	const text = getTrackNameTextFromFilePath(filePath);
 
-	trackName.textContent = temp_text;
-	trackName.style.removeProperty('animation');
+	trackName.textContent = text;
+	trackName.style.animation = 'none';
+	trackName.offsetHeight; /* trigger reflow */
+	trackName.style.animation = null;
+	trackName.style.removeProperty('animation-timing-function');
 	clearTimeout(trackNameScrollTimeoutId);
-
-	if (trackName.offsetWidth > trackNameContainer.offsetWidth - 32)
-	{
-		trackName.textContent = `${temp_text}               ${temp_text}`; //15 spaces
-		const animationLoopTime = Math.floor(trackName.offsetWidth / 80);
-		trackName.style.animation = `scroll-track-name-animation ${animationLoopTime}s cubic-bezier(0.3, 0, 0.7, 0.7) infinite`;
-		trackNameScrollTimeoutId = setTimeout(() => { trackName.style.animation = `scroll-track-name-animation ${animationLoopTime}s linear infinite`; }, animationLoopTime * 1000);
-	}
+	setTextScrolling(trackName, trackNameContainer.offsetWidth - 32, text, true);
 }
 
-function getTrackNameTextFromFilePath(filePath) { return isDev ? filePath : filePath.split('\\')[splitPath.length - 1]; }
+function setTextScrolling(textElement, visibleWidth, text, isTrackName = false)
+{
+	textElement.textContent = text;
+
+	if (textElement.offsetWidth > visibleWidth)
+	{
+		textElement.textContent = `${text}               ${text}`; //15 spaces
+		const animationLoopTime = Math.floor(textElement.offsetWidth / 80);
+		textElement.style.setProperty('--animationLoopTime', `${animationLoopTime}s`);
+		if (isTrackName)
+		{
+			trackNameScrollTimeoutId = setTimeout(() => { trackName.style.animationTimingFunction = 'linear !important'; }, animationLoopTime * 1000);
+			trackName.style.animationPlayState = 'running';
+		}
+	}
+	else if (isTrackName) trackName.style.animationPlayState = 'paused';
+}
+
+function getTrackNameTextFromFilePath(filePath)
+{
+	if (isDev) return filePath;
+	const splitPath = filePath.split('\\');
+	return splitPath[splitPath.length - 1];
+}
 
 //set one of time texts' content
 function setTimeText(index)
