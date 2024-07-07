@@ -664,10 +664,17 @@ body
 	transform: scale(0.9);
 }
 
-.playlist-track .btn:hover { transform: scale(1.05); }
-.playlist-track .btn:active { transform: scale(0.7); }
-.playlist-track .btn:hover { background: rgba(255, 0, 0, 0.75); }
-.playlist-track .btn:active { background: rgba(255, 0, 0, 0.5); }
+.playlist-track .btn:hover
+{
+	background: rgba(255, 0, 0, 0.75);
+	transform: scale(1.05);
+}
+
+.playlist-track .btn:active
+{
+	background: rgba(255, 0, 0, 0.5);
+	transform: scale(0.7);
+}
 
 .track-controls
 {
