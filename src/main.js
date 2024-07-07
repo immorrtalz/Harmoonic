@@ -269,7 +269,7 @@ function addAudioFileToPlaylist(filePath)
 	const playlistTrack = playlistTracksContainer.children[playlistTracksContainer.children.length - 1];
 
 	const playlistTrackNameText = playlistTrack.querySelector('.playlist-track-name');
-	setTextScrolling(playlistTrackNameText, playlistTrackNameText.parentElement.offsetWidth, text);
+	setTextScrolling(playlistTrackNameText, playlistTrackNameText.parentElement.offsetWidth - 20, text);
 
 	playlistTrack.querySelector('.playlistTrackRemoveBtn').addEventListener('click', (event) =>
 	{
