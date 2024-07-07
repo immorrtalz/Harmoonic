@@ -23,6 +23,7 @@ const trackTimelineFront = document.querySelector('.track-timeline-front');
 const timelineHandle = document.querySelector('.track-timeline-handle-visual');
 const musicPlayer = document.querySelector('#music');
 const accentColorButtons = document.querySelectorAll('.settings-param-color');
+const clearPlaylistOnNewFileCheckbox = document.getElementById('clearPlaylistOnNewFileCheckbox');
 const equalizerInputs = document.querySelectorAll('.equalizer-bar-front');
 const equalizerBarHandles = document.querySelectorAll('.equalizer-bar-handle-visual');
 const playlistTracksContainer = document.getElementById('playlistTracksContainer');
@@ -32,15 +33,16 @@ var EQContext = new AudioContext();
 const EQFrequencies = [30, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
 const EQFilters = EQFrequencies.map(createEQFilter);
 var canTransitionBetweenPages = true;
-var isPlayAfterTimelineValueChange = false;
 var trackNameScrollTimeoutId;
-var playlistTrackDragOverIntervalId;
-var mousePosition;
+var isPlayAfterTimelineValueChange = false;
+var isTimelineValueInput = false;
+var timelineValueInputTimeoutId;
 
 class Settings
 {
 	accentColor = 16;
 	eq;
+	clearPlaylistOnNewFile = true;
 
 	constructor() { this.resetEQ(); }
 	resetEQ() { this.eq = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]; }
@@ -88,9 +90,9 @@ currentMonitor().then(async (currentMonitorResult) =>
 
 		if (isFilePathOK(eventFilePath))
 		{
-			clearPlaylist();
+			if (settings.clearPlaylistOnNewFile) clearPlaylist();
 			addAudioFileToPlaylist(eventFilePath);
-			playAudioFile(playlist[0]);
+			if (settings.clearPlaylistOnNewFile) playAudioFile(playlist[0]);
 		}
 		
 		await appWindow.unminimize();
@@ -115,6 +117,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 
 	await initializeAccentColorButtons();
 	await initializeEQ();
+	await initializeClearPlaylistOnNewFileCheckbox();
 	await loadSettingsFromFile();
 
 	const backBtns = document.querySelectorAll('.backBtn');
@@ -140,6 +143,10 @@ document.addEventListener('DOMContentLoaded', async () =>
 			setTimeText(1);
 			if (!musicPlayer.paused) isPlayAfterTimelineValueChange = true;
 			musicPlayer.pause();
+
+			isTimelineValueInput = true;
+			clearTimeout(timelineValueInputTimeoutId);
+			timelineValueInputTimeoutId = setTimeout(() => { isTimelineValueInput = false; }, 100);
 		}
 	});
 
@@ -168,7 +175,8 @@ document.addEventListener('DOMContentLoaded', async () =>
 		setTimelineValue();
 		setTimeText(1);
 		if (playlist.length == 1) pause(true);
-		else skipForward();
+		else if (!isTimelineValueInput) skipForward();
+		isPlayAfterTimelineValueChange = false;
 	});
 
 	setInterval(() => { if (!musicPlayer.paused) setTimelineValue(); }, 50);
@@ -210,6 +218,16 @@ async function initializeEQ()
 			saveSettingsToFile();
 		});
 	}
+}
+
+async function initializeClearPlaylistOnNewFileCheckbox()
+{
+	clearPlaylistOnNewFileCheckbox.addEventListener('click', () =>
+	{
+		settings.clearPlaylistOnNewFile = !settings.clearPlaylistOnNewFile;
+		changeClearPlaylistOnNewFile();
+		saveSettingsToFile();
+	});
 }
 
 function setTimelineValue()
@@ -279,11 +297,7 @@ function addAudioFileToPlaylist(filePath)
 
 function removeAudioFileFromPlaylist(index)
 {
-	if (index == 0)
-	{
-		if (playlist.length == 1) exit(0);
-		//skipForward();
-	}
+	if (index == 0 && playlist.length == 1) exit(0);
 	playlist.splice(index, 1);
 	playlistTracksContainer.children[index].remove();
 }
@@ -302,9 +316,12 @@ async function addAudioFilesToPlaylistViaOpenFile()
 	{
 		if (Array.isArray(selected))
 		{
-			for (var i = 0; i < selected.length; i++) addAudioFileToPlaylist(selected[i]);
+			for (var i = 0; i < selected.length; i++)
+			{
+				if (isFilePathOK(selected[i])) addAudioFileToPlaylist(selected[i]);
+			}
 		}
-		else addAudioFileToPlaylist(selected);
+		else if (isFilePathOK(selected)) addAudioFileToPlaylist(selected);
 	}
 }
 
@@ -368,12 +385,8 @@ function skipForward()
 function setTrackNameText(filePath)
 {
 	const text = getTrackNameTextFromFilePath(filePath);
-
-	trackName.textContent = text;
-	trackName.style.animation = 'none';
-	trackName.offsetHeight; /* trigger reflow */
-	trackName.style.animation = null;
 	trackName.style.removeProperty('animation-timing-function');
+	trackName.style.removeProperty('--animationLoopTime');
 	clearTimeout(trackNameScrollTimeoutId);
 	setTextScrolling(trackName, trackNameContainer.offsetWidth - 32, text, true);
 }
@@ -387,13 +400,10 @@ function setTextScrolling(textElement, visibleWidth, text, isTrackName = false)
 		textElement.textContent = `${text}               ${text}`; //15 spaces
 		const animationLoopTime = Math.floor(textElement.offsetWidth / 80);
 		textElement.style.setProperty('--animationLoopTime', `${animationLoopTime}s`);
+
 		if (isTrackName)
-		{
-			trackNameScrollTimeoutId = setTimeout(() => { trackName.style.animationTimingFunction = 'linear !important'; }, animationLoopTime * 1000);
-			trackName.style.animationPlayState = 'running';
-		}
+			trackNameScrollTimeoutId = setTimeout(() => { trackName.style.animationTimingFunction = 'linear'; console.log(trackName.style.animationTimingFunction); }, animationLoopTime * 1000);
 	}
-	else if (isTrackName) trackName.style.animationPlayState = 'paused';
 }
 
 function getTrackNameTextFromFilePath(filePath)
@@ -461,7 +471,10 @@ function changeAccentColor()
 	document.documentElement.style.setProperty('--clr-accent', `hsl(${18 * (settings.accentColor - 1)}, 100%, 61%)`);
 
 	for (var i = 0; i < accentColorButtons.length; i++)
-		accentColorButtons[i].style.outline = '2px solid ' + (i == settings.accentColor - 1 ? 'rgba(255, 255, 255, 1)' : 'var(--clr-white-transparent-50)');
+	{
+		accentColorButtons[i].style.removeProperty('outline');
+		if (i == settings.accentColor - 1) accentColorButtons[i].style.outline = '2px solid white';
+	}
 }
 
 //change value of one of EQ bars
@@ -486,6 +499,8 @@ async function resetEQ()
 	});
 }
 
+function changeClearPlaylistOnNewFile() { clearPlaylistOnNewFileCheckbox.checked = settings.clearPlaylistOnNewFile; }
+
 async function loadSettingsFromFile()
 {
 	const appConfigDirPath = await appConfigDir();
@@ -502,6 +517,7 @@ async function loadSettingsFromFile()
 	//apply loaded settings
 	changeAccentColor();
 	for (var i = 0; i < equalizerInputs.length; i++) changeEQ(i, false);
+	changeClearPlaylistOnNewFile();
 }
 
 async function saveSettingsToFile() { if (settingsFilePath != '') await writeTextFile(settingsFilePath, JSON.stringify(settings)); }
