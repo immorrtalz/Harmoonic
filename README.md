@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-GPL%20v3-yellow?color=goldenrod)](https://github.com/immorrtalz/Harmoonic/blob/main/LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/immorrtalz/Harmoonic?color=orange)]()
 [![CodeFactor](https://www.codefactor.io/repository/github/immorrtalz/harmoonic/badge)](https://www.codefactor.io/repository/github/immorrtalz/harmoonic)
-[![VirusTotal](https://img.shields.io/badge/virustotal-secure-limegreen)](https://www.virustotal.com/gui/file/ea2ae5199e1fff232b5e75a660f5a8f6c9646481350b759cd08f6228f07b5cbb/detection)
+[![virustotal](https://github.com/immorrtalz/Harmoonic/actions/workflows/virustotal.yml/badge.svg)](https://github.com/immorrtalz/Harmoonic/actions/workflows/virustotal.yml)
 [![Discord](https://img.shields.io/discord/600372807062519848?label=developer's%20discord&color=slateblue)](https://discord.gg/GbzYVdF)
 
 Simple audio player with modern design
