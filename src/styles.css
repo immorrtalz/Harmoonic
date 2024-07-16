@@ -179,6 +179,22 @@ body
 	z-index: 10000;
 }
 
+.top-text-app-name
+{
+	position: absolute;
+	top: 0;
+	left: 1rem;
+	width: fit-content;
+	height: 40px;
+	margin: 0;
+	padding: 0;
+	color: var(--clr-white-transparent-12);
+	font-size: 75%;
+	font-weight: 500;
+	line-height: 40px;
+	letter-spacing: 1px;
+}
+
 .top-buttons
 {
 	position: absolute;
@@ -325,7 +341,7 @@ body
 {
 	width: 100%;
 	height: fit-content;
-	margin: 0;
+	margin: 0 0 1.5rem 0;
 	padding: 0 0.5rem 0 0;
 	display: flex;
 	flex-direction: row;
@@ -406,7 +422,7 @@ body
 .settings-param-color:nth-child(11) { background: var(--clr-template-11); }
 .settings-param-color:nth-child(12) { background: var(--clr-template-12); }
 
-.settings-param-name-inline { margin: 0; display: inline-block; margin-right: 0.5rem; }
+.settings-param-name-inline { margin: 0 0.5rem 1.5rem 0; display: inline-block; }
 .settings-param-inline { display: inline-block; }
 
 .equalizer-bars

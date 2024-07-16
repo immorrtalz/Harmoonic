@@ -12,6 +12,9 @@
 	<span class="main-gradient"></span>
 
 	<div class="draggable-zone" data-tauri-drag-region></div>
+
+	<p class="top-text-app-name">Harmoonic</p>
+
 	<div class="top-buttons">
 
 		<div class="app-buttons">
@@ -90,8 +93,23 @@
 			</div>
 
 			<div class="settings-param-flexcontainer">
-				<h3 class="settings-param-name settings-param-name">Clear playlist when opening a new file (for ex. by double-click)</h3>
+				<h3 class="settings-param-name">Clear playlist when opening a new file (for ex. by double-click)</h3>
 				<input class="checkbox" type="checkbox" id="clearPlaylistOnNewFileCheckbox" checked>
+			</div>
+
+			<div class="settings-param-flexcontainer">
+				<h3 class="settings-param-name" id="currentVersionText">Current version: </h3>
+				<button class="btn" id="latestVersionLinkBtn">Get latest</button>
+			</div>
+
+			<div class="settings-param-flexcontainer">
+				<h3 class="settings-param-name" id="currentVersionText">Source code</h3>
+				<button class="btn" id="gitHubLinkBtn">GitHub</button>
+			</div>
+
+			<div class="settings-param-flexcontainer">
+				<h3 class="settings-param-name" id="currentVersionText">Developer site</h3>
+				<button class="btn" id="devSiteLinkBtn">Open</button>
 			</div>
 
 		</div>
@@ -212,6 +230,6 @@
 
 </body>
 
-<script src="./main.js"></script>
+<script src="./main.js" type="module"></script>
 
 </html>

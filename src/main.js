@@ -7,6 +7,8 @@ const { appConfigDir, dataDir } = window.__TAURI__.path;
 const { exists, createDir, readTextFile, writeTextFile } = window.__TAURI__.fs;
 const { message, ask, open } = window.__TAURI__.dialog;
 const { listen } = window.__TAURI__.event;
+const { getVersion } = window.__TAURI__.app;
+const shell_open = window.__TAURI__.shell.open;
 
 const isDev = false;
 const supportedExtensions = [ 'mp3', 'wav', 'weba', 'webm', 'm4a', 'ogg', 'oga', 'caf', 'flac', 'opus', 'mid', 'aiff', 'wma', 'au' ];
@@ -92,11 +94,14 @@ currentMonitor().then(async (currentMonitorResult) =>
 		{
 			if (settings.clearPlaylistOnNewFile) clearPlaylist();
 			addAudioFileToPlaylist(eventFilePath);
-			if (settings.clearPlaylistOnNewFile) playAudioFile(playlist[0]);
+
+			if (settings.clearPlaylistOnNewFile)
+			{
+				playAudioFile(playlist[0]);
+				await appWindow.unminimize();
+				await appWindow.setFocus();
+			}
 		}
-		
-		await appWindow.unminimize();
-		await appWindow.setFocus();
 	});
 
 	await listen('tauri://file-drop', async (event) =>
@@ -133,6 +138,11 @@ document.addEventListener('DOMContentLoaded', async () =>
 	document.getElementById('skipForwardBtn').addEventListener('click', () => { skipForward(); });
 	document.getElementById('resetEQBtn').addEventListener('click', () => { resetEQ(); });
 	document.getElementById('addAudioFileToPlaylistBtn').addEventListener('click', () => { addAudioFilesToPlaylistViaOpenFile(); });
+	document.getElementById('latestVersionLinkBtn').addEventListener('click', async () => { await shell_open('https://github.com/immorrtalz/Harmoonic/releases/latest'); });
+	document.getElementById('gitHubLinkBtn').addEventListener('click', async () => { await shell_open('https://github.com/immorrtalz/Harmoonic'); });
+	document.getElementById('devSiteLinkBtn').addEventListener('click', async () => { await shell_open('https://evermedia-project.ru'); });
+
+	document.getElementById('currentVersionText').textContent += await getVersion();
 
 	trackTimelineFront.addEventListener('input', (e) =>
 	{
@@ -273,7 +283,10 @@ function addAudioFileToPlaylist(filePath)
 
 	playlistTrack.querySelector('.playlistTrackRemoveBtn').addEventListener('click', (event) =>
 	{
-		removeAudioFileFromPlaylist(Array.from(event.target.parentElement.parentElement.children).indexOf(event.target.parentElement));
+		const index = Array.from(event.target.parentElement.parentElement.children).indexOf(event.target.parentElement);
+		if (index == 0 && playlist.length > 1) skipForward();
+		else if (playlist.length > 1) removeAudioFileFromPlaylist(index);
+		else exit(0);
 	});
 
 	const moveTrackArrows = playlistTrack.querySelector('.playlist-track-move-arrows').children;
@@ -293,13 +306,6 @@ function addAudioFileToPlaylist(filePath)
 			playlistTracksContainer.insertBefore(playlistTracksContainer.children[targetTrackIndex], playlistTracksContainer.children[targetTrackIndex + targetArrowIndex]);
 		});
 	}
-}
-
-function removeAudioFileFromPlaylist(index)
-{
-	if (index == 0 && playlist.length == 1) exit(0);
-	playlist.splice(index, 1);
-	playlistTracksContainer.children[index].remove();
 }
 
 async function addAudioFilesToPlaylistViaOpenFile()
@@ -323,6 +329,13 @@ async function addAudioFilesToPlaylistViaOpenFile()
 		}
 		else if (isFilePathOK(selected)) addAudioFileToPlaylist(selected);
 	}
+}
+
+function removeAudioFileFromPlaylist(index)
+{
+	if (playlist.length == 1) exit(0);
+	playlist.splice(index, 1);
+	playlistTracksContainer.children[index].remove();
 }
 
 function playPause()
@@ -401,8 +414,8 @@ function setTextScrolling(textElement, visibleWidth, text, isTrackName = false)
 		const animationLoopTime = Math.floor(textElement.offsetWidth / 80);
 		textElement.style.setProperty('--animationLoopTime', `${animationLoopTime}s`);
 
-		if (isTrackName)
-			trackNameScrollTimeoutId = setTimeout(() => { trackName.style.animationTimingFunction = 'linear'; console.log(trackName.style.animationTimingFunction); }, animationLoopTime * 1000);
+		if (isTrackName) { trackNameScrollTimeoutId = setTimeout(() =>
+			{ trackName.style.animationTimingFunction = 'linear'; console.log(trackName.style.animationTimingFunction); }, animationLoopTime * 1000) };
 	}
 }
 

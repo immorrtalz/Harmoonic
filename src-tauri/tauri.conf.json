@@ -28,11 +28,6 @@
 			{
 				"scope": [
 					{
-						"name": "use-cmd",
-						"cmd": "cmd",
-						"args": true
-					},
-					{
 						"name": "use-powershell",
 						"cmd": "powershell",
 						"args": true
@@ -80,9 +75,8 @@
 				"./icons/16x16.ico",
 				"./icons/24x24.ico"
 			],
-			"copyright": "Copyright © 2024 EVERMEDIA PROJECT",
+			"copyright": "© 2024 EVERMEDIA PROJECT",
 			"category": "Music",
-			"shortDescription": "Simple audio player with modern design",
 			"appimage":
 			{
 				"bundleMediaFramework": true
