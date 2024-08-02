@@ -32,3 +32,7 @@ Open source, lightweight, fast and Windows only
 ![harmoonic-screenshot-2](https://github.com/user-attachments/assets/96534686-1784-4084-9df4-5bb25648470f)
 ![harmoonic-screenshot-3](https://github.com/user-attachments/assets/9960e4b3-221c-42e5-9960-4fbddadac3b6)
 ![harmoonic-screenshot-4](https://github.com/user-attachments/assets/1fd7ede7-cd35-4dd6-8624-d2f776aef45c)
+
+---
+
+Font "Montserrat" - Copyright © 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)
