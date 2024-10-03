@@ -1,0 +1,46 @@
+{
+	"$schema": "https://schema.tauri.app/config/2.0.0",
+	"productName": "Harmoonic",
+	"version": "1.0.1",
+	"identifier": "com.EVERMEDIAPROJECT.Harmoonic",
+	"build": {
+		"frontendDist": "../src"
+	},
+	"app": {
+		"withGlobalTauri": true,
+		"windows": [
+			{
+				"label": "main",
+				"width": 540,
+				"height": 1200,
+				"fullscreen": false,
+				"x": 0,
+				"y": 0,
+				"transparent": true,
+				"decorations": true,
+				"shadow": true,
+				"visible": true
+			}
+		],
+		"security": {
+			"csp": "asset:"
+		}
+	},
+	"bundle": {
+		"active": true,
+		"targets": "all",
+		"publisher": "EVERMEDIA PROJECT",
+		"icon": [
+			"./icons/icon.png",
+			"./icons/icon.ico"
+		],
+		"copyright": "© 2024 EVERMEDIA PROJECT",
+		"category": "Music",
+		"fileAssociations":
+		[
+			{
+				"ext": [ "mp3", "wav", "weba", "webm", "m4a", "ogg", "oga", "caf", "flac", "opus", "mid", "aiff", "wma", "au" ]
+			}
+		]
+	}
+}
