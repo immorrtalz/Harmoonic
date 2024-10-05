@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
 	<title>Harmoonic</title>
 	<link rel="stylesheet" href="./styles.css">
 </head>
@@ -11,97 +11,89 @@
 <body>
 
 	<span class="main-gradient"></span>
-	<div class="noise-overlay-1 masked-noise" src="./assets/noise100.png"></div>
-	<div class="noise-overlay-2 masked-noise" src="./assets/noise20.png"></div>
+	<div class="noise-overlay masked-noise"></div>
 
 	<div class="currently-playing">
+		<audio id="music" preload="auto"></audio>
 
-		<div class="currently-playing-object">
+		<div class="currently-playing-container">
 
 			<div class="currently-playing-panel">
-				<div class="noise-overlay-1" src="./assets/noise100.png"></div>
-				<div class="noise-overlay-2" src="./assets/noise20.png"></div>
+				<div class="noise-overlay"></div>
 			</div>
 	
-			<p>Super long track music file name that doesn't fit here</p>
+			<div class="currently-playing-track-name-container">
+				<p class="currently-playing-track-name">Super long track music file name that doesn't fit here</p>
+			</div>
+
+			<div class="currently-playing-control-button action-element"><img src="./assets/skipback.png"></div>
+			<div class="currently-playing-control-button currently-playing-pause-button action-element"><img src="./assets/pause.png"></div>
+			<div class="currently-playing-control-button action-element"><img src="./assets/skipforward.png"></div>
 
 		</div>
-		
 	</div>
 
-	<div class="page">
+	<div class="page main-page">
 
 		<div class="top-section">
 
 			<div class="top-section-buttons-container">
-				<div class="icon-button"><img src="./assets/menu.png"></div>
+				<div class="icon-button action-element"><img src="./assets/menu.png"></div>
 			</div>
 
 			<h1 class="page-name">Library</h1>
 
 			<div class="top-section-buttons-container">
-				<div class="icon-button"><img src="./assets/search.png"></div>
-				<div class="icon-button"><img src="./assets/playlist.png"></div>
+				<div class="icon-button action-element"><img src="./assets/search.png"></div>
+				<div class="icon-button action-element"><img src="./assets/playlist.png"></div>
 			</div>
 
 		</div>
 
 		<div class="page-scroll-container">
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-			<div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-		</div>
-
-		<!-- <div class="icon-text-button"><img src="./assets/search.png"><p>Button</p></div>
-
-		<div class="toggle">
-			<input class="toggle-input" type="checkbox">
-			<div class="toggle-handle"></div>
-			<div class="toggle-background"></div>
-		</div> -->
-	</div>
-
-	<!-- <span class="main-gradient"></span>
-
-	<p class="top-text-app-name">Harmoonic</p>
-
-	<div class="top-buttons">
-
-		<div class="app-buttons">
-			<button class="btn app-button" id="openPlaylistBtn"><img src="./assets/playlist.png"></button>
-			<button class="btn app-button" id="openEQBtn"><img src="./assets/eq.png"></button>
-			<button class="btn app-button" id="openSettingsBtn"><img src="./assets/settings.png"></button>
-		</div>
-
-		<div class="separator"></div>
-
-		<div class="app-buttons">
-			<button class="btn app-button" id="minimizeAppBtn"><img src="./assets/minimize.png"></button>
-			<button class="btn app-button btn-close" id="closeAppBtn"><img src="./assets/close.png"></button>
+			<div class="track-or-folder library-track track-or-folder-currently-playing"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder playlist-track"><img src="./assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button"><img src="./assets/delete.png"></div></div>
+			<div class="track-or-folder playlist-track track-or-folder-currently-playing"><img src="./assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button"><img src="./assets/delete.png"></div></div>
+			<div class="track-or-folder folder"><img src="./assets/folder.png"><p>Super long folder name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
 		</div>
 
 	</div>
 
-	<div class="content-container page-main">
+	<div class="side-menu">
 
-		<audio id="music" preload="auto"></audio>
+		<div class="side-menu-bg"></div>
+		<div class="noise-overlay"></div>
 
-		<div class="track-name-container"><h1 class="track-name"></h1></div>
+		<div class="side-menu-container">
+			<p class="side-menu-app-name">Harmoonic</p>
+
+			<div class="icon-text-button action-element"><img src="./assets/eq.png"><p>Equalizer</p></div>
+			<div class="icon-text-button action-element"><img src="./assets/settings.png"><p>Settings</p></div>
+		</div>
+
+	</div>
+
+	<!-- <div class="toggle action-element">
+		<input class="toggle-input" type="checkbox">
+		<div class="toggle-handle"></div>
+		<div class="toggle-background"></div>
+	</div> -->
+
+	<!-- <div class="content-container ">
 
 		<div class="track-controls">
 			<button class="btn btn-square track-controls-skip-back" id="skipBackBtn"><img src="./assets/skipback.png"></button>
@@ -124,7 +116,7 @@
 
 	</div>
 
-	<div class="content-container page-settings">
+	<div class="content-container settings-page">
 
 		<div class="page-header">
 			<button class="btn btn-square backBtn"><img src="./assets/back.png"></button>
@@ -180,7 +172,7 @@
 		</div>
 	</div>
 
-	<div class="content-container page-equalizer">
+	<div class="content-container equalizer-page">
 
 		<div class="page-header">
 			<button class="btn btn-square backBtn"><img src="./assets/back.png"></button>
@@ -281,7 +273,7 @@
 
 	</div>
 
-	<div class="content-container page-playlist">
+	<div class="content-container playlist-page">
 
 		<div class="page-header">
 			<button class="btn btn-square backBtn"><img src="./assets/back.png"></button>

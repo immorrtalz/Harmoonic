@@ -11,8 +11,8 @@
 		"windows": [
 			{
 				"label": "main",
-				"width": 540,
-				"height": 1200,
+				"width": 432,
+				"height": 960,
 				"fullscreen": false,
 				"x": 0,
 				"y": 0,
@@ -23,11 +23,14 @@
 			}
 		],
 		"security": {
-			"csp": "asset:"
+			"csp": "asset:; http://asset.localhost"
 		}
 	},
 	"bundle": {
 		"active": true,
+		"android": {
+			"minSdkVersion": 26
+		},
 		"targets": "all",
 		"publisher": "EVERMEDIA PROJECT",
 		"icon": [
