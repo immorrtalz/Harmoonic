@@ -4,7 +4,10 @@
 	"version": "1.0.1",
 	"identifier": "com.EVERMEDIAPROJECT.Harmoonic",
 	"build": {
-		"frontendDist": "../src"
+		"beforeDevCommand": "npm run dev",
+		"devUrl": "http://localhost:1420",
+		"beforeBuildCommand": "npm run build",
+		"frontendDist": "../dist"
 	},
 	"app": {
 		"withGlobalTauri": true,
@@ -16,14 +19,14 @@
 				"fullscreen": false,
 				"x": 0,
 				"y": 0,
-				"transparent": true,
+				"transparent": false,
 				"decorations": true,
 				"shadow": true,
 				"visible": true
 			}
 		],
 		"security": {
-			"csp": "asset:; http://asset.localhost"
+			"csp": "asset: http://asset.localhost"
 		}
 	},
 	"bundle": {

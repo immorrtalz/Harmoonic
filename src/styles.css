@@ -6,9 +6,43 @@
 	--clr-white-transparent-5: rgba(255, 255, 255, 0.05);
 	--clr-white-transparent-10: rgba(255, 255, 255, 0.1);
 	--clr-white-transparent-25: rgba(255, 255, 255, 0.25);
+	--clr-white-transparent-40: rgba(255, 255, 255, 0.4);
 	--clr-white-transparent-50: rgba(255, 255, 255, 0.5);
 	--clr-white-transparent-75: rgba(255, 255, 255, 0.75);
 }
+
+/* #region Ripple */
+.with-ripple { overflow: clip; pointer-events: all !important; }
+.with-ripple * { pointer-events: none; }
+
+.ripple
+{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 0;
+	height: 0;
+	border-radius: 50%;
+	background: var(--clr-white-transparent-50);
+	background-position: center;
+	animation: ripple 1s;
+	opacity: 0;
+	pointer-events: none;
+}
+
+@keyframes ripple
+{
+	0% { opacity: 0; }
+	15% { opacity: 1; }
+	100%
+	{
+		opacity: 0;
+		width: 200%;
+		padding-bottom: 200%;
+	}
+}
+/* #endregion */
 
 /* #region Base */
 
@@ -42,12 +76,13 @@
 	-moz-user-select: none;
 	-khtml-user-select: none;
 	-webkit-user-select: none;
-	transition: all 0.2s cubic-bezier(0.83, 0, 0.17, 1);
+	transition: all 0.3s;
 	position: relative;
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
 	font-family: Montserrat, system-ui;
+	text-rendering: optimizeLegibility;
 	color: white;
 }
 
@@ -112,8 +147,6 @@ body
 	background: var(--clr-white-transparent-10);
 	border-radius: 16px;
 	backdrop-filter: blur(16px);
-	transition: all 0.4s;
-	will-change: transform;
 }
 
 .action-element img
@@ -131,26 +164,9 @@ body
 	font-weight: 500;
 }
 
-.action-element *
-{
-	opacity: 0.5;
-	transition: all 0.4s;
-	will-change: transform;
-}
-
-.action-element:active, .action-element:active .toggle-handle
-{
-	background: var(--clr-white-transparent-5);
-	transform: scale(0.7);
-	transition: all 0.4s, transform 1s cubic-bezier(0, 0.55, 0.45, 1), margin 0.3s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-.action-element:active *
-{
-	opacity: 0.25;
-	transition: all 0.4s;
-}
-
+.action-element * { opacity: 0.5; }
+.action-element:active, .action-element:active .toggle-handle { background: var(--clr-white-transparent-10); }
+.action-element:active * { opacity: 0.75; }
 .action-element:active .toggle-background { background: var(--clr-white-transparent-25); }
 
 .icon-text-button
@@ -172,11 +188,7 @@ body
 	border-radius: 16px;
 }
 
-.toggle:active
-{
-	background: none;
-	transform: none;
-}
+.toggle:active { background: none; }
 
 .toggle-input
 {
@@ -194,7 +206,6 @@ body
 	background: var(--clr-white-transparent-25);
 	border-radius: calc(16px - 8px);
 	pointer-events: none;
-	transition: all 0.4s, margin 0.3s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 .toggle-background
@@ -212,18 +223,15 @@ body
 {
 	background: var(--clr-accent);
 	opacity: 0.35;
-	transition: all 0.4s;
 }
 
 .toggle-input:checked + .toggle-handle
 {
 	margin-left: 40px;
 	background: white;
-	transition: all 0.4s, margin 0.3s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 /* TrackOrFolder */
-
 .track-or-folder
 {
 	width: 40px;
@@ -233,8 +241,6 @@ body
 	border: 1px solid var(--clr-white-transparent-5);
 	border-radius: 16px;
 	backdrop-filter: blur(16px);
-	transition: all 0.4s;
-	will-change: transform;
 }
 
 .track-or-folder p
@@ -250,26 +256,15 @@ body
 	overflow: clip;
 }
 
-.track-or-folder *
+.track-or-folder * { opacity: 0.5; }
+
+.library-track:active, .playlist-track:active, .folder:active
 {
-	opacity: 0.5;
-	transition: all 0.4s;
-	will-change: transform;
+	background: var(--clr-white-transparent-10);
+	border: 1px solid var(--clr-white-transparent-25);
 }
 
-.library-track:active, .folder:active
-{
-	background: var(--clr-white-transparent-5);
-	border: 1px solid transparent;
-	transform: scale(0.7);
-	transition: all 0.4s, transform 1s cubic-bezier(0, 0.55, 0.45, 1), margin 0.3s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-.library-track:active *, .folder:active *
-{
-	opacity: 0.25;
-	transition: all 0.4s;
-}
+.library-track:active *, .folder:active * { opacity: 0.75; }
 
 .track-or-folder-currently-playing
 {
@@ -278,6 +273,14 @@ body
 }
 
 .track-or-folder-currently-playing * { opacity: 0.75; }
+
+.track-or-folder-currently-playing:active
+{
+	background: color-mix(in hsl, var(--clr-white-transparent-2), var(--clr-accent) 30%);
+	border: 1px solid var(--clr-accent);
+}
+
+.track-or-folder-currently-playing:active * { opacity: 1; }
 
 .playlist-track, .folder
 {
@@ -310,6 +313,7 @@ body
 	flex-shrink: 0;
 	background: none;
 	backdrop-filter: none;
+	transition: all 0.4s;
 }
 
 .delete-from-playlist-button img
@@ -321,24 +325,20 @@ body
 }
 
 .delete-from-playlist-button:active { background: color-mix(in hsl, var(--clr-white-transparent-10), red); }
-.delete-from-playlist-button:active * { opacity: 0.5; }
-
-.folder
-{
-	background: var(--clr-white-transparent-10);
-}
+.delete-from-playlist-button:active * { opacity: 0.85; }
+.folder { background: var(--clr-white-transparent-10); }
 .folder p { width: calc(100% - 4px - 30px); }
 /* #endregion */
 
-/* #region CurrentlyPlaying */
-.currently-playing
+/* #region CurrentlyPlayingBar */
+.currently-playing-bar
 {
 	position: absolute;
 	inset: auto 10px 10px 10px;
 	height: 46px;
 }
 
-.currently-playing-container
+.currently-playing-bar-container
 {
 	position: relative;
 	width: 100%;
@@ -352,17 +352,41 @@ body
 	gap: 2px;
 }
 
-.currently-playing-panel
+.currently-playing-bar-timeline-back
 {
+	position: absolute;
+	inset: 0.5px 0.5px 0 0.5px;
+	background: var(--clr-white-transparent-40);
+	border-radius: 16px;
+}
+
+.currently-playing-bar-timeline-front
+{
+	position: absolute;
+	inset: 0.5px 0.5px 0 0.5px;
+	background: linear-gradient(to right, var(--clr-accent) 70%, transparent 70%);
+	border-radius: 16px;
+}
+
+.currently-playing-bar-panel
+{
+	position: absolute;
+	inset: 0 0 2px 0;
+	background: var(--clr-background);
+	border-radius: 16px;
+	overflow: clip;
+}
+
+.currently-playing-bar-panel::after
+{
+	content: '';
 	position: absolute;
 	inset: 0;
 	background: var(--clr-white-transparent-5);
-	border-radius: 16px;
-	overflow: clip;
-	border-bottom: 2px solid var(--clr-white-transparent-25);
+	border-radius: inherit;
 }
 
-.currently-playing-panel:before
+.currently-playing-bar-panel:before
 {
 	content: '';
 	position: absolute;
@@ -372,7 +396,7 @@ body
 	border-radius: inherit;
 }
 
-.currently-playing-track-name-container
+.currently-playing-bar-track-name-container
 {
 	width: 100%;
 	height: 100%;
@@ -380,7 +404,7 @@ body
 	overflow: visible;
 }
 
-.currently-playing-track-name
+.currently-playing-bar-track-name
 {
 	position: absolute;
 	top: 0;
@@ -400,7 +424,7 @@ body
 	animation-timing-function: cubic-bezier(0.3, 0, 0.7, 0.7);
 }
 
-.currently-playing-control-button
+.currently-playing-bar-control-button
 {
 	width: 32px;
 	height: 32px;
@@ -413,26 +437,30 @@ body
 	backdrop-filter: none;
 }
 
-.currently-playing-control-button img
+.currently-playing-bar-control-button img
 {
 	width: 100%;
 	height: 100%;
 	opacity: 0.85;
 }
 
-.currently-playing-control-button:active { background: var(--clr-white-transparent-10); }
-.currently-playing-control-button:active * { opacity: 0.5; }
-
-.currently-playing-pause-button { padding: 2px; }
+.currently-playing-bar-control-button:active { background: var(--clr-white-transparent-10); }
+.currently-playing-bar-control-button:active * { opacity: 0.5; }
+.currently-playing-bar-pause-button { padding: 2px; }
 /* #endregion */
 
+/* #region SideMenu */
 .side-menu
 {
 	position: absolute;
 	inset: 0;
 	opacity: 0;
+	pointer-events: none;
+	display: none;
 	/* animation: side-menu-open 0.01s; */
 }
+
+.side-menu * { pointer-events: none; }
 
 .side-menu-bg
 {
@@ -485,8 +513,8 @@ body
 
 @keyframes side-menu-open
 {
-	0% { opacity: 0; }
-	100% { opacity: 1; }
+	0% { opacity: 0; pointer-events: none; }
+	100% { opacity: 1; pointer-events: all; }
 }
 
 @keyframes side-menu-open-bg
@@ -500,7 +528,9 @@ body
 	0% { transform: translateX(-100%); }
 	100% { transform: translateX(0%); }
 }
+/* #endregion */
 
+/* #region Page */
 .page
 {
 	width: 100%;
@@ -583,6 +613,7 @@ body
 .page-scroll-container::-webkit-scrollbar-button:vertical:start:decrement { height: 1rem; }
 .page-scroll-container::-webkit-scrollbar-button:vertical:end:increment { height: calc(2rem + 46px); }
 /* Scrollbar END*/
+/* #endregion */
 
 .track-name-container
 {
@@ -1110,4 +1141,4 @@ body
 	transition: all 0.2s cubic-bezier(0.83, 0, 0.17, 1), left 0s, transform 0.2s;
 }
 
-#music, #music-select { display: none; }
+#music { display: none; }
