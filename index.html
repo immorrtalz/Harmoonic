@@ -13,65 +13,123 @@
 	<span class="main-gradient"></span>
 	<div class="noise-overlay masked-noise"></div>
 
-	<div class="currently-playing-bar">
-		<audio id="music" preload="auto"></audio>
-
-		<div class="currently-playing-bar-timeline-back"></div>
-		<div class="currently-playing-bar-timeline-front"></div>
-
-		<div class="currently-playing-bar-panel">
-			<div class="noise-overlay"></div>
-		</div>
-
-		<div class="currently-playing-bar-container">
-	
-			<div class="currently-playing-bar-track-name-container">
-				<p class="currently-playing-bar-track-name">Super long track music file name that doesn't fit here</p>
-			</div>
-
-			<div class="currently-playing-bar-control-button action-element with-ripple"><img src="./src/assets/skipback.png"></div>
-			<div class="currently-playing-bar-control-button currently-playing-bar-pause-button action-element with-ripple"><img src="./src/assets/pause.png"></div>
-			<div class="currently-playing-bar-control-button action-element with-ripple"><img src="./src/assets/skipforward.png"></div>
-
-		</div>
-	</div>
-
-	<div class="page main-page">
+	<div id="main-content-wrapper">
 
 		<div class="top-section">
 
 			<div class="top-section-buttons-container">
-				<div class="icon-button action-element with-ripple"><img src="./src/assets/menu.png"></div>
+				<div class="icon-button action-element with-ripple" id="openSideMenuBtn"><img src="./src/assets/menu.png"></div>
+				<div class="icon-button action-element with-ripple" id="backBtn"><img src="./src/assets/back.png"></div>
 			</div>
 
 			<h1 class="page-name">Library</h1>
 
 			<div class="top-section-buttons-container">
 				<div class="icon-button action-element with-ripple"><img src="./src/assets/search.png"></div>
-				<div class="icon-button action-element with-ripple"><img src="./src/assets/playlist.png"></div>
+				<div class="icon-button action-element with-ripple" id="openPlaylistPageBtn"><img src="./src/assets/playlist.png"></div>
 			</div>
 
 		</div>
 
-		<div class="page-scroll-container">
-			<div class="track-or-folder library-track track-or-folder-currently-playing with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder playlist-track with-ripple"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
-			<div class="track-or-folder playlist-track track-or-folder-currently-playing with-ripple"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
-			<div class="track-or-folder folder with-ripple"><img src="./src/assets/folder.png"><p>Super long folder name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
-			<div class="track-or-folder library-track with-ripple"><p>Super long track music file name that doesn't fit here</p></div>
+		<div class="currently-playing-bar">
+			<audio id="music" preload="auto"></audio>
+
+			<div class="currently-playing-bar-timeline-back"></div>
+			<div class="currently-playing-bar-timeline-front"></div>
+
+			<div class="currently-playing-bar-panel">
+				<div class="noise-overlay"></div>
+			</div>
+
+			<div class="currently-playing-bar-container">
+		
+				<div class="currently-playing-bar-track-name-container">
+					<p class="currently-playing-bar-track-name">Super long track music file name that doesn't fit here</p>
+				</div>
+
+				<div class="currently-playing-bar-control-button action-element with-ripple"><img src="./src/assets/skipback.png"></div>
+				<div class="currently-playing-bar-control-button currently-playing-bar-pause-button action-element with-ripple"><img src="./src/assets/pause.png"></div>
+				<div class="currently-playing-bar-control-button action-element with-ripple"><img src="./src/assets/skipforward.png"></div>
+
+			</div>
+		</div>
+
+		<div class="page main-page">
+
+			<div class="page-scroll-container">
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track track-or-folder-currently-playing"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder folder"><img src="./src/assets/folder.png"><p>Super long folder name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+				<div class="track-or-folder library-track"><p>Super long track music file name that doesn't fit here</p></div>
+			</div>
+
+			<div class="dark-blur-gradient-mask">
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</div>
+
+		</div>
+
+		<div class="page playlist-page">
+
+			<div class="page-scroll-container">
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track track-or-folder-currently-playing"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+				<div class="track-or-folder playlist-track"><img src="./src/assets/drag.png"><p>Super long track music file name that doesn't fit here</p><div class="action-element delete-from-playlist-button with-ripple"><img src="./src/assets/delete.png"></div></div>
+			</div>
+
+			<div class="dark-blur-gradient-mask">
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</div>
+
 		</div>
 
 	</div>
@@ -79,7 +137,7 @@
 	<div class="side-menu">
 
 		<div class="side-menu-bg"></div>
-		<div class="noise-overlay"></div>
+		<!-- <div class="noise-overlay"></div> -->
 
 		<div class="side-menu-container">
 			<p class="side-menu-app-name">Harmoonic</p>
@@ -297,6 +355,6 @@
 </script>
 
 <script src="./src/main.ts" type="module"></script>
-<script src="./src/ripple.js" type="module"></script>
+<script src="./src/ripple.js"></script>
 
 </html>
