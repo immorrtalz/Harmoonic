@@ -22,10 +22,13 @@
 				<div class="icon-button action-element with-ripple" id="backBtn"><img src="./src/assets/back.png"></div>
 			</div>
 
-			<h1 class="page-name">Library</h1>
+			<div class="page-name-container">
+				<h1 class="page-name">Library</h1>
+				<h1 class="page-name">Library</h1>
+			</div>
 
 			<div class="top-section-buttons-container">
-				<div class="icon-button action-element with-ripple"><img src="./src/assets/search.png"></div>
+				<!-- <div class="icon-button action-element with-ripple"><img src="./src/assets/search.png"></div> -->
 				<div class="icon-button action-element with-ripple" id="openPlaylistPageBtn"><img src="./src/assets/playlist.png"></div>
 			</div>
 
@@ -132,6 +135,243 @@
 
 		</div>
 
+		<div class="page equalizer-page">
+
+			<div class="page-scroll-container">
+
+				<div class="page-content-container-object-column">
+
+					<div class="page-content-container-object-row">
+						<p class="page-content-text">Left side</p>
+						<div class="icon-button action-element with-ripple"><img src="./src/assets/reset.png"></div>
+					</div>
+
+					<div class="equalizer-bars" id="leftEQBars">
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">30</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">125</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">250</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">500</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">1K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">2K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">4K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">8K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">12K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">16K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+					</div>
+				</div>
+
+				<div class="page-content-container-object-column">
+
+					<div class="page-content-container-object-row">
+						<p class="page-content-text">Right side</p>
+						<div class="icon-button action-element with-ripple"><img src="./src/assets/reset.png"></div>
+					</div>
+
+					<div class="equalizer-bars equalizer-bars-inactive" id="rightEQBars">
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">30</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">125</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">250</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">500</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">1K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">2K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">4K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">8K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">12K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+						<div class="equalizer-bar">
+							<p class="equalizer-bar-text">16K</p>
+							<span class="equalizer-bar-back"></span>
+							<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+							<span class="equalizer-bar-handle-visual"></span>
+						</div>
+
+						<div class="equalizer-bar-default-value-dot"></div>
+
+					</div>
+
+					<div class="page-content-container-object-row">
+						<p class="page-content-text">Same as left side</p>
+
+						<div class="toggle action-element">
+							<input class="toggle-input" type="checkbox">
+							<div class="toggle-handle"></div>
+							<div class="toggle-background"></div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="dark-blur-gradient-mask">
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</div>
+
+		</div>
+
 	</div>
 
 	<div class="side-menu">
@@ -142,17 +382,11 @@
 		<div class="side-menu-container">
 			<p class="side-menu-app-name">Harmoonic</p>
 
-			<div class="icon-text-button action-element with-ripple"><img src="./src/assets/eq.png"><p>Equalizer</p></div>
-			<div class="icon-text-button action-element with-ripple"><img src="./src/assets/settings.png"><p>Settings</p></div>
+			<div class="icon-text-button action-element with-ripple" id="openEqualizerPageBtn"><img src="./src/assets/eq.png"><p>Equalizer</p></div>
+			<div class="icon-text-button action-element with-ripple" id="openSettingsPageBtn"><img src="./src/assets/settings.png"><p>Settings</p></div>
 		</div>
 
 	</div>
-
-	<!-- <div class="toggle action-element">
-		<input class="toggle-input" type="checkbox">
-		<div class="toggle-handle"></div>
-		<div class="toggle-background"></div>
-	</div> -->
 
 	<!-- <div class="content-container ">
 
@@ -318,18 +552,18 @@
 			<p class="equalizer-bar-text">16K</p>
 		</div>
 
-		<div class="equalizer-default-values-dots">
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
-			<div class="equalizer-default-values-dot"></div>
+		<div class="equalizer-bar-default-value-dots">
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
+			<div class="equalizer-bar-default-value-dot"></div>
 		</div>
 
 	</div>

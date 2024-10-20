@@ -36,20 +36,21 @@ const mainContentWrapper = getElement('#main-content-wrapper');
 
 const allPages = getElementsByClassName('page');
 
-const topSection = getElement('.top-section');
-const currentlyPlayingBar = getElement('.currently-playing-bar');
+const backBtn = getElement('#backBtn');
+const pageNameTexts = getElementsByClassName('page-name');
 
 const sideMenu = getElement('.side-menu');
 const sideMenuBg = getElement('.side-menu-bg');
 const sideMenuContainer = getElement('.side-menu-container');
 
-const backBtn = getElement('#backBtn');
+const openEqualizerPageBtn = getElement('#openEqualizerPageBtn');
+const openSettingsPageBtn = getElement('#openSettingsPageBtn');
 
 var playlist = [];
 var EQContext = new AudioContext();
 const EQFrequencies = [30, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
 /* const EQFilters = EQFrequencies.map(createEQFilter); */
-var sideMenuOpened = false;
+var isSideMenuOpened = false;
 var canTransitionBetweenPages = true;
 var sideMenuCloseTimeoutId : number;
 /* var trackNameScrollTimeoutId;
@@ -63,9 +64,11 @@ document.addEventListener('DOMContentLoaded', () =>
 	sideMenuBg.addEventListener('click', () => openOrCloseSideMenu(1));
 
 	getElement('#openPlaylistPageBtn').addEventListener('click', () => openPage(1));
+	openEqualizerPageBtn.addEventListener('click', () => { openPage(2); removeRipplesInChildren(openEqualizerPageBtn); });
+	/* openSettingsPageBtn.addEventListener('click', () => { openPage(3); removeRipplesInChildren(openSettingsPageBtn); }); */
 });
 
-function hideOrRevealObject(element : HTMLElement, hideOrReveal : number)
+function hideOrRevealElement(element : HTMLElement, hideOrReveal : number)
 {
 	switch (hideOrReveal)
 	{
@@ -74,8 +77,7 @@ function hideOrRevealObject(element : HTMLElement, hideOrReveal : number)
 			setTimeout(() =>
 			{
 				element.style.display = 'none';
-				var ripples = element.getElementsByClassName('ripple');
-				while (ripples.length > 0) ripples[0].parentElement?.remove();
+				removeRipplesInChildren(element);
 			}, 300);
 			break;
 	
@@ -84,8 +86,14 @@ function hideOrRevealObject(element : HTMLElement, hideOrReveal : number)
 			setTimeout(() => { element.style.opacity = '1'; }, 0);
 			break;
 
-		default: throw new Error('Either 0 or 1 must be passed to hideOrRevealObject()');
+		default: throw new Error('Either 0 or 1 must be passed to hideOrReveal property of hideOrRevealElement()');
 	}
+}
+
+function removeRipplesInChildren(element : HTMLElement)
+{
+	var ripples = element.getElementsByClassName('ripple');
+	while (ripples.length > 0) ripples[0].parentElement?.remove();
 }
 
 function openOrCloseSideMenu(openOrClose : number)
@@ -93,12 +101,11 @@ function openOrCloseSideMenu(openOrClose : number)
 	switch (openOrClose)
 	{
 		case 0:
-			if (sideMenuOpened) return;
+			if (isSideMenuOpened) return;
 
 			clearTimeout(sideMenuCloseTimeoutId);
 
-			sideMenuOpened = true;
-			canTransitionBetweenPages = false;
+			isSideMenuOpened = true;
 			sideMenu.style.display = 'unset';
 
 			// without this animations are bugged
@@ -114,13 +121,12 @@ function openOrCloseSideMenu(openOrClose : number)
 			break;
 	
 		case 1:
-			if (!sideMenuOpened) return;
+			if (!isSideMenuOpened) return;
 
 			sideMenuCloseTimeoutId = setTimeout(() =>
 			{
 				sideMenu.style.display = '';
-				sideMenuOpened = false;
-				canTransitionBetweenPages = true;
+				isSideMenuOpened = false;
 			}, 500);
 
 			sideMenuBg.style.opacity = '';
@@ -138,25 +144,29 @@ function openOrCloseSideMenu(openOrClose : number)
 // pages transition
 function openPage(nextPageIndex : number)
 {
-	if (!canTransitionBetweenPages) return;
 	const prevPageIndex = getCurrentPageIndex();
-	if (prevPageIndex == nextPageIndex) return;
+	if (!canTransitionBetweenPages) return;
+	if (prevPageIndex == nextPageIndex) { if (isSideMenuOpened) openOrCloseSideMenu(1); return; }
 	canTransitionBetweenPages = false;
 
-	console.log(backBtn);
-	hideOrRevealObject(backBtn, Number(nextPageIndex != 0));
-	backBtn.addEventListener('click', () => openPage(0));
+	hideOrRevealElement(backBtn, Number(nextPageIndex != 0));
+	eval(`backBtn.${nextPageIndex == 0 ? 'remove' : 'add'}EventListener('click', () => openPage(0));`);
+	if (isSideMenuOpened && nextPageIndex == 2) openOrCloseSideMenu(1);
 
 	const pageNames = ['main', 'playlist', 'equalizer', 'settings'];
+
+	pageNameTexts[1].textContent = nextPageIndex == 0 ? 'Library' : pageNames[nextPageIndex][0].toUpperCase() + pageNames[nextPageIndex].slice(1);
+	hideOrRevealElement(pageNameTexts[0], 0);
+	hideOrRevealElement(pageNameTexts[1], 1);
+	setTimeout(() => { [pageNameTexts[0], pageNameTexts[1]] = [pageNameTexts[1], pageNameTexts[0]]; }, 300);
 
 	const prevPage = getElement(`.${pageNames[prevPageIndex]}-page`);
 	const nextPage = getElement(`.${pageNames[nextPageIndex]}-page`);
 
 	prevPage.style.opacity = '0';
 	prevPage.style.transform = 'scale(0.9)';
-	prevPage.style.pointerEvents = 'none';
 	prevPage.style.zIndex = '-1';
-	nextPage.style.display = 'unset';
+	nextPage.style.display = 'unset !important';
 
 	setTimeout(() =>
 	{
@@ -169,9 +179,8 @@ function openPage(nextPageIndex : number)
 	{
 		prevPage.style.display = 'none';
 		prevPage.style.transform = 'scale(1.1)';
-		nextPage.style.pointerEvents = 'all';
 		canTransitionBetweenPages = true;
-	}, 250);
+	}, 300);
 }
 
 // get index of page which user is currently on
