@@ -29,6 +29,11 @@
 			"csp": "asset: http://asset.localhost"
 		}
 	},
+	"plugins": {
+		"fs": {
+			"scope": ["*"]
+		}
+	},
 	"bundle": {
 		"active": true,
 		"android": {
