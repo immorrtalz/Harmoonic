@@ -4,9 +4,10 @@ import { platform } from '@tauri-apps/plugin-os';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { appConfigDir, dataDir, join } from '@tauri-apps/api/path';
 import { exists, mkdir, readDir, readTextFile, writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
-/* import { message, ask, open } from '@tauri-apps/plugin-dialog'; //npm i @tauri-apps/plugin-dialog --save */
+import { message, ask, open } from '@tauri-apps/plugin-dialog'; //npm i @tauri-apps/plugin-dialog --save
 import { EventCallback, listen } from '@tauri-apps/api/event';
 import { getVersion } from '@tauri-apps/api/app';
+import { event } from '@tauri-apps/api';
 
 /* import { shell_open } from '@tauri-apps/api/open'; */
 
@@ -73,13 +74,44 @@ document.addEventListener('DOMContentLoaded', () =>
 	openSettingsPageBtn.addEventListener('click', () => { openPage(3); removeRipplesInChildren(openSettingsPageBtn); });
 
 	getElement('#testBtn').addEventListener('click', () => addMusicFilesLocation());
+	/* getElement('#testInput').addEventListener('change', (e) => addMusicFilesLocation(e)); */
 });
 
 async function addMusicFilesLocation()
 {
-	const entries = await readDir('', { baseDir: BaseDirectory.Home });
-	console.log(entries);
-	console.log(entries[0]); //doesn't work
+	//const entries = await readDir('', { baseDir: BaseDirectory.Audio });
+
+	const selected = await open(
+	{
+		multiple: true,
+		recursive: true,
+		filters: [
+		{
+			name: 'Audio',
+			extensions: supportedExtensions
+		}]
+	});
+
+	if (Array.isArray(selected))
+	{
+		// user selected multiple files
+	}
+	else if (selected === null)
+	{
+		// user cancelled the selection
+	}
+	else
+	{
+		// user selected a single file
+	}
+
+	console.log(selected);
+
+	/* var target : HTMLInputElement = e.target as HTMLInputElement;
+	var targetFiles : FileList = target.files as FileList;
+	console.log(targetFiles);
+	console.log(targetFiles[0].webkitRelativePath);
+	console.log(convertFileSrc(targetFiles[0].webkitRelativePath)); */
 }
 
 function hideOrRevealElement(element : HTMLElement, hideOrReveal : number)
