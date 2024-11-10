@@ -39,6 +39,7 @@
 		<div class="track-name-container"><h1 class="track-name"></h1></div>
 
 		<div class="track-controls">
+			<button class="btn btn-square" id="shuffleBtn"><img src="./assets/shuffle.png"><div></div></button>
 			<button class="btn btn-square track-controls-skip-back" id="skipBackBtn"><img src="./assets/skipback.png"></button>
 			<button class="btn btn-square track-controls-pause" id="playPauseBtn"><img src="./assets/play.png"></button>
 			<button class="btn btn-square track-controls-skip-forward" id="skipForwardBtn"><img src="./assets/skipforward.png"></button>
@@ -95,6 +96,11 @@
 			<div class="settings-param-flexcontainer">
 				<h3 class="settings-param-name">Clear playlist when opening a new file (for ex. by double-click)</h3>
 				<input class="checkbox" type="checkbox" id="clearPlaylistOnNewFileCheckbox" checked>
+			</div>
+
+			<div class="settings-param-flexcontainer">
+				<h3 class="settings-param-name">Enable shuffle by default</h3>
+				<input class="checkbox" type="checkbox" id="enableShuffleByDefaultCheckbox">
 			</div>
 
 			<div class="settings-param-flexcontainer">

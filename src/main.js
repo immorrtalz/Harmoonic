@@ -26,9 +26,11 @@ const timelineHandle = document.querySelector('.track-timeline-handle-visual');
 const musicPlayer = document.querySelector('#music');
 const accentColorButtons = document.querySelectorAll('.settings-param-color');
 const clearPlaylistOnNewFileCheckbox = document.getElementById('clearPlaylistOnNewFileCheckbox');
+const enableShuffleByDefaultCheckbox = document.getElementById('enableShuffleByDefaultCheckbox');
 const equalizerInputs = document.querySelectorAll('.equalizer-bar-front');
 const equalizerBarHandles = document.querySelectorAll('.equalizer-bar-handle-visual');
 const playlistTracksContainer = document.getElementById('playlistTracksContainer');
+const shuffleBtn = document.getElementById('shuffleBtn')
 
 var playlist = [];
 var EQContext = new AudioContext();
@@ -39,12 +41,14 @@ var trackNameScrollTimeoutId;
 var isPlayAfterTimelineValueChange = false;
 var isTimelineValueInput = false;
 var timelineValueInputTimeoutId;
+var isShuffleEnabled = false;
 
 class Settings
 {
 	accentColor = 16;
 	eq;
 	clearPlaylistOnNewFile = true;
+	enableShuffleByDefault = false;
 
 	constructor() { this.resetEQ(); }
 	resetEQ() { this.eq = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]; }
@@ -123,6 +127,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 	await initializeAccentColorButtons();
 	await initializeEQ();
 	await initializeClearPlaylistOnNewFileCheckbox();
+	await initializeEnableShuffleByDefaultCheckbox();
 	await loadSettingsFromFile();
 
 	const backBtns = document.querySelectorAll('.backBtn');
@@ -133,6 +138,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 	document.getElementById('openSettingsBtn').addEventListener('click', () => { openPage(1); });
 	document.getElementById('minimizeAppBtn').addEventListener('click', () => { appWindow.minimize(); });
 	document.getElementById('closeAppBtn').addEventListener('click', () => { exit(0); });
+	shuffleBtn.addEventListener('click', () => { switchShuffle(); });
 	document.getElementById('skipBackBtn').addEventListener('click', () => { skipBack(); });
 	document.getElementById('playPauseBtn').addEventListener('click', () => { playPause(); });
 	document.getElementById('skipForwardBtn').addEventListener('click', () => { skipForward(); });
@@ -142,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 	document.getElementById('gitHubLinkBtn').addEventListener('click', async () => { await shell_open('https://github.com/immorrtalz/Harmoonic'); });
 	document.getElementById('devSiteLinkBtn').addEventListener('click', async () => { await shell_open('https://evermedia-project.ru'); });
 
+	if (settings.enableShuffleByDefault) switchShuffle();
 	document.getElementById('currentVersionText').textContent += await getVersion();
 
 	trackTimelineFront.addEventListener('input', (e) =>
@@ -236,6 +243,16 @@ async function initializeClearPlaylistOnNewFileCheckbox()
 	{
 		settings.clearPlaylistOnNewFile = !settings.clearPlaylistOnNewFile;
 		changeClearPlaylistOnNewFile();
+		saveSettingsToFile();
+	});
+}
+
+async function initializeEnableShuffleByDefaultCheckbox()
+{
+	enableShuffleByDefaultCheckbox.addEventListener('click', () =>
+	{
+		settings.enableShuffleByDefault = !settings.enableShuffleByDefault;
+		changeEnableShuffleByDefault();
 		saveSettingsToFile();
 	});
 }
@@ -362,6 +379,13 @@ function pause(isOnlyVisual = false)
 	if (!isOnlyVisual) musicPlayer.pause();
 }
 
+function switchShuffle()
+{
+	isShuffleEnabled = !isShuffleEnabled;
+	if (shuffleBtn.classList.contains('shuffleBtn-checked')) shuffleBtn.classList.remove('shuffleBtn-checked');
+	else shuffleBtn.classList.add('shuffleBtn-checked');
+}
+
 //skip to the beginning of current track
 function skipBack()
 {
@@ -389,10 +413,20 @@ function skipForward()
 
 		if (playlist.length > 1)
 		{
+			if (isShuffleEnabled) doShuffle(playlist);
 			playAudioFile(playlist[1]);
 			removeAudioFileFromPlaylist(0);
 		}
 	}
+}
+
+function doShuffle()
+{
+	const nextTrackIndex = randomIntFromInterval(1, playlist.length - 1);
+	const temp = playlist[1];
+	playlist[1] = playlist[nextTrackIndex];
+	playlist[nextTrackIndex] = temp;
+	playlistTracksContainer.insertBefore(playlistTracksContainer.children[nextTrackIndex], playlistTracksContainer.children[1]);
 }
 
 function setTrackNameText(filePath)
@@ -415,7 +449,7 @@ function setTextScrolling(textElement, visibleWidth, text, isTrackName = false)
 		textElement.style.setProperty('--animationLoopTime', `${animationLoopTime}s`);
 
 		if (isTrackName) { trackNameScrollTimeoutId = setTimeout(() =>
-			{ trackName.style.animationTimingFunction = 'linear'; console.log(trackName.style.animationTimingFunction); }, animationLoopTime * 1000) };
+			{ trackName.style.animationTimingFunction = 'linear'; }, animationLoopTime * 1000) };
 	}
 }
 
@@ -513,6 +547,7 @@ async function resetEQ()
 }
 
 function changeClearPlaylistOnNewFile() { clearPlaylistOnNewFileCheckbox.checked = settings.clearPlaylistOnNewFile; }
+function changeEnableShuffleByDefault() { enableShuffleByDefaultCheckbox.checked = settings.enableShuffleByDefault; }
 
 async function loadSettingsFromFile()
 {
@@ -531,6 +566,7 @@ async function loadSettingsFromFile()
 	changeAccentColor();
 	for (var i = 0; i < equalizerInputs.length; i++) changeEQ(i, false);
 	changeClearPlaylistOnNewFile();
+	changeEnableShuffleByDefault();
 }
 
 async function saveSettingsToFile() { if (settingsFilePath != '') await writeTextFile(settingsFilePath, JSON.stringify(settings)); }
@@ -552,3 +588,4 @@ function isFilePathOK(filePath) { return filePath !== undefined && filePath !== 
 function isExtensionSupported(filePath) { return filePath === null ? true : supportedExtensions.includes(filePath.split('.').slice(-1).toString().toLowerCase()); }
 function isMusicSourceNull() { return musicPlayer.src === null || musicPlayer.src.trim() == ''; }
 function remap(value, low1, high1, low2, high2) { return low2 + (high2 - low2) * (value - low1) / (high1 - low1); }
+function randomIntFromInterval(min, max) { return Math.floor(Math.random() * (max - min + 1) + min); } // min and max included

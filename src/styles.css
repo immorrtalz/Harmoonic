@@ -692,6 +692,40 @@ body
 	transform: scale(0.7);
 }
 
+#shuffleBtn
+{
+	position: absolute;
+	left: -3rem;
+	margin: 0;
+	padding: 0;
+}
+
+#shuffleBtn img { opacity: 0.25; }
+#shuffleBtn.shuffleBtn-checked img { opacity: 0.5; }
+
+#shuffleBtn div
+{
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	transform: scale(0.8);
+	object-fit: contain;
+	background: color-mix(in hsl, var(--clr-accent), hsl(0, 0%, 100%) 100%);
+	opacity: 0;
+	mask-image: url('./assets/shuffle.png');
+	mask-size: contain;
+	pointer-events: none;
+}
+
+#shuffleBtn.shuffleBtn-checked div
+{
+	background: color-mix(in hsl, var(--clr-accent), hsl(0, 0%, 100%) 20%);
+	opacity: 0.75;
+}
+
 .track-controls
 {
 	position: absolute;
@@ -709,7 +743,7 @@ body
 	justify-content: space-around;
 }
 
-.track-controls-skip-back, .track-controls-skip-forward
+.track-controls-skip-back, .track-controls-skip-forward, #shuffleBtn
 {
 	width: 2.25rem;
 	height: 2.25rem;
