@@ -10,10 +10,11 @@ const { listen } = window.__TAURI__.event;
 const { getVersion } = window.__TAURI__.app;
 const shell_open = window.__TAURI__.shell.open;
 
-const isDev = false;
+const isDev = true;
 const supportedExtensions = [ 'mp3', 'wav', 'weba', 'webm', 'm4a', 'ogg', 'oga', 'caf', 'flac', 'opus', 'mid', 'aiff', 'wma', 'au' ];
 
 const mainGradient = document.querySelector('.main-gradient');
+const noise = document.querySelector('.noise');
 const allPages = document.querySelectorAll('.content-container');
 const trackNameContainer = document.querySelector('.track-name-container');
 const trackName = document.querySelector('.track-name');
@@ -31,8 +32,10 @@ const equalizerInputs = document.querySelectorAll('.equalizer-bar-front');
 const equalizerBarHandles = document.querySelectorAll('.equalizer-bar-handle-visual');
 const playlistTracksContainer = document.getElementById('playlistTracksContainer');
 const shuffleBtn = document.getElementById('shuffleBtn')
+const repeatBtn = document.getElementById('repeatBtn')
 
 var playlist = [];
+var currentTrackIndex = 0;
 var EQContext = new AudioContext();
 const EQFrequencies = [30, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
 const EQFilters = EQFrequencies.map(createEQFilter);
@@ -42,6 +45,8 @@ var isPlayAfterTimelineValueChange = false;
 var isTimelineValueInput = false;
 var timelineValueInputTimeoutId;
 var isShuffleEnabled = false;
+var repeatState = 0;
+var forceStartPaused = false;
 
 class Settings
 {
@@ -79,7 +84,11 @@ currentMonitor().then(async (currentMonitorResult) =>
 	if (parseInt(sysVer[2], 10) >= 22621)
 	{
 		invoke('winacrylic', appWindow);
-		await appWindow.onFocusChanged(({ payload: isFocused }) => { mainGradient.style.opacity = isFocused ? '0.5' : '0.85'; });
+		await appWindow.onFocusChanged(({ payload: isFocused }) =>
+		{
+			mainGradient.style.opacity = isFocused ? '0.5' : '0.85';
+			noise.style.opacity = isFocused ? '0.3' : '0.5';
+		});
 	}
 	else mainGradient.style.opacity = '1';
 
@@ -88,7 +97,7 @@ currentMonitor().then(async (currentMonitorResult) =>
 
 	if (!isDev) await validateFilePath(filePath);
 	addAudioFileToPlaylist(filePath);
-	playAudioFile(playlist[0]);
+	playAudioFile(playlist[currentTrackIndex]);
 
 	await listen('single-instance', async (event) =>
 	{
@@ -101,7 +110,7 @@ currentMonitor().then(async (currentMonitorResult) =>
 
 			if (settings.clearPlaylistOnNewFile)
 			{
-				playAudioFile(playlist[0]);
+				playAudioFile(playlist[currentTrackIndex]);
 				await appWindow.unminimize();
 				await appWindow.setFocus();
 			}
@@ -124,10 +133,10 @@ document.addEventListener('DOMContentLoaded', async () =>
 {
 	document.addEventListener('contextmenu', (event) => event.preventDefault());
 
-	await initializeAccentColorButtons();
-	await initializeEQ();
-	await initializeClearPlaylistOnNewFileCheckbox();
-	await initializeEnableShuffleByDefaultCheckbox();
+	initializeAccentColorButtons();
+	initializeEQ();
+	initializeClearPlaylistOnNewFileCheckbox();
+	initializeEnableShuffleByDefaultCheckbox();
 	await loadSettingsFromFile();
 
 	const backBtns = document.querySelectorAll('.backBtn');
@@ -139,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 	document.getElementById('minimizeAppBtn').addEventListener('click', () => { appWindow.minimize(); });
 	document.getElementById('closeAppBtn').addEventListener('click', () => { exit(0); });
 	shuffleBtn.addEventListener('click', () => { switchShuffle(); });
+	repeatBtn.addEventListener('click', () => { switchRepeat(); });
 	document.getElementById('skipBackBtn').addEventListener('click', () => { skipBack(); });
 	document.getElementById('playPauseBtn').addEventListener('click', () => { playPause(); });
 	document.getElementById('skipForwardBtn').addEventListener('click', () => { skipForward(); });
@@ -157,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 		{
 			musicPlayer.currentTime = e.target.value;
 			setTimelineHandlePosition();
-			setTimeText(1);
+			updateTimeText(1);
 			if (!musicPlayer.paused) isPlayAfterTimelineValueChange = true;
 			musicPlayer.pause();
 
@@ -179,28 +189,30 @@ document.addEventListener('DOMContentLoaded', async () =>
 	musicPlayer.addEventListener('loadeddata', () =>
 	{
 		trackTimelineFront.max = Number(musicPlayer.duration.toFixed(2));
-		setTimelineValue();
-		setTimeText(1);
-		setTimeText(2);
-		play();
+		updateTimelineValue();
+		updateTimeText(1);
+		updateTimeText(2);
+		if (forceStartPaused) pause(true);
+		else play();
+		forceStartPaused = false;
 	});
 	
 	musicPlayer.addEventListener('pause', () => { pause(true); });
 	musicPlayer.addEventListener('play', () => { play(true); });
 	musicPlayer.addEventListener('ended', () =>
 	{
-		setTimelineValue();
-		setTimeText(1);
-		if (playlist.length == 1) pause(true);
+		updateTimelineValue();
+		updateTimeText(1);
+		if (currentTrackIndex == playlist.length - 1 && repeatState == 0) pause(true);
 		else if (!isTimelineValueInput) skipForward();
 		isPlayAfterTimelineValueChange = false;
 	});
 
-	setInterval(() => { if (!musicPlayer.paused) setTimelineValue(); }, 50);
-	setInterval(() => { if (!musicPlayer.paused) setTimeText(1); }, 100);
+	setInterval(() => { if (!musicPlayer.paused) updateTimelineValue(); }, 50);
+	setInterval(() => { if (!musicPlayer.paused) updateTimeText(1); }, 100);
 });
 
-async function initializeAccentColorButtons()
+function initializeAccentColorButtons()
 {
 	for (var i = 0; i < accentColorButtons.length; i++)
 	{
@@ -215,7 +227,7 @@ async function initializeAccentColorButtons()
 	}
 }
 
-async function initializeEQ()
+function initializeEQ()
 {
 	const source = EQContext.createMediaElementSource(musicPlayer);
 
@@ -237,7 +249,7 @@ async function initializeEQ()
 	}
 }
 
-async function initializeClearPlaylistOnNewFileCheckbox()
+function initializeClearPlaylistOnNewFileCheckbox()
 {
 	clearPlaylistOnNewFileCheckbox.addEventListener('click', () =>
 	{
@@ -247,7 +259,7 @@ async function initializeClearPlaylistOnNewFileCheckbox()
 	});
 }
 
-async function initializeEnableShuffleByDefaultCheckbox()
+function initializeEnableShuffleByDefaultCheckbox()
 {
 	enableShuffleByDefaultCheckbox.addEventListener('click', () =>
 	{
@@ -257,7 +269,7 @@ async function initializeEnableShuffleByDefaultCheckbox()
 	});
 }
 
-function setTimelineValue()
+function updateTimelineValue()
 {
 	trackTimelineFront.value = musicPlayer.currentTime;
 	setTimelineHandlePosition();
@@ -278,6 +290,7 @@ function playAudioFile(filePath)
 function clearPlaylist()
 {
 	playlist = [];
+	currentTrackIndex = 0;
 	playlistTracksContainer.innerHTML = "";
 }
 
@@ -287,31 +300,31 @@ function addAudioFileToPlaylist(filePath)
 	const text = getTrackNameTextFromFilePath(filePath);
 
 	playlistTracksContainer.insertAdjacentHTML('beforeend',
-	`<div class="playlist-track">
+	`<div class="playlist-track playlist-track-unplayed">
 		<div class="playlist-track-move-arrows"><img src="./assets/listarrowup.png"><img src="./assets/listarrowup.png"></div>
 		<div class="playlist-track-name-container"><p class="playlist-track-name">${text}</p></div>
 		<button class="btn btn-square playlistTrackRemoveBtn"><img src="./assets/delete.png"></button>
 	</div>`);
 
-	const playlistTrack = playlistTracksContainer.children[playlistTracksContainer.children.length - 1];
-
-	const playlistTrackNameText = playlistTrack.querySelector('.playlist-track-name');
+	const addedPlaylistTrack = playlistTracksContainer.children[playlistTracksContainer.children.length - 1];
+	addedPlaylistTrack.addEventListener('click', (event) => skipToTrack(event.target));
+	const playlistTrackNameText = addedPlaylistTrack.querySelector('.playlist-track-name');
 	setTextScrolling(playlistTrackNameText, playlistTrackNameText.parentElement.offsetWidth - 20, text);
 
-	playlistTrack.querySelector('.playlistTrackRemoveBtn').addEventListener('click', (event) =>
+	addedPlaylistTrack.querySelector('.playlistTrackRemoveBtn').addEventListener('click', (event) =>
 	{
-		const index = Array.from(event.target.parentElement.parentElement.children).indexOf(event.target.parentElement);
-		if (index == 0 && playlist.length > 1) skipForward();
-		else if (playlist.length > 1) removeAudioFileFromPlaylist(index);
-		else exit(0);
+		removeTrackFromPlaylist(event.target.parentElement);
+		event.stopPropagation();
 	});
 
-	const moveTrackArrows = playlistTrack.querySelector('.playlist-track-move-arrows').children;
+	const moveTrackArrows = addedPlaylistTrack.querySelector('.playlist-track-move-arrows').children;
 	
 	for (var i = 0; i < moveTrackArrows.length; i++)
 	{
 		moveTrackArrows[i].addEventListener('click', (event) =>
 		{
+			event.stopPropagation();
+
 			var targetArrowIndex = Array.from(event.target.parentElement.children).indexOf(event.target);
 			if (targetArrowIndex == 0) targetArrowIndex = -1;
 			const targetTrackIndex = Array.from(playlistTracksContainer.children).indexOf(event.target.parentElement.parentElement);
@@ -319,6 +332,7 @@ function addAudioFileToPlaylist(filePath)
 
 			playlist[targetTrackIndex] = playlist[targetTrackIndex + targetArrowIndex];
 			playlist[targetTrackIndex + targetArrowIndex] = targetTrackFromPlaylist;
+
 			if (targetArrowIndex == 1) targetArrowIndex = 2;
 			playlistTracksContainer.insertBefore(playlistTracksContainer.children[targetTrackIndex], playlistTracksContainer.children[targetTrackIndex + targetArrowIndex]);
 		});
@@ -348,19 +362,30 @@ async function addAudioFilesToPlaylistViaOpenFile()
 	}
 }
 
-function removeAudioFileFromPlaylist(index)
+function removeTrackFromPlaylist(trackElement)
 {
-	if (playlist.length == 1) exit(0);
-	playlist.splice(index, 1);
-	playlistTracksContainer.children[index].remove();
+	const trackElementIndex = Array.from(trackElement.parentElement.children).indexOf(trackElement);
+	const newTracksCount = playlist.length - currentTrackIndex - 1;
+	const playedTracksCount = playlist.length - newTracksCount - 1;
+
+	if (trackElementIndex == currentTrackIndex)
+	{
+		if (newTracksCount > 0 || repeatState != 0) skipForward();
+		else if (playedTracksCount > 0) skipBack(true);
+		else exit(0);
+	}
+
+	if (trackElementIndex < currentTrackIndex) currentTrackIndex--;
+	playlist.splice(trackElementIndex, 1);
+	playlistTracksContainer.children[trackElementIndex].remove();
 }
 
 function playPause()
 {
 	if (!isMusicSourceNull())
 	{
-		setTimelineValue();
-		setTimeText(1);
+		updateTimelineValue();
+		updateTimeText(1);
 
 		if (musicPlayer.paused) play();
 		else pause();
@@ -386,14 +411,43 @@ function switchShuffle()
 	else shuffleBtn.classList.add('shuffleBtn-checked');
 }
 
-//skip to the beginning of current track
-function skipBack()
+function switchRepeat()
+{
+	if (repeatState < 2) repeatState++;
+	else repeatState = 0;
+
+	if (repeatState == 0 && repeatBtn.classList.contains('repeatBtn-checked'))
+	{
+		repeatBtn.classList.remove('repeatBtn-checked');
+		repeatBtn.classList.remove('repeatBtn-checked-2');
+	}
+	else repeatBtn.classList.add('repeatBtn-checked');
+
+	if (repeatState == 2) repeatBtn.classList.add('repeatBtn-checked-2');
+}
+
+//skip to the beginning of current track or to previous track
+function skipBack(skipDirectlyToPreviousTrack = false)
 {
 	if (!isMusicSourceNull())
 	{
+		const tempTime = musicPlayer.currentTime;
 		musicPlayer.currentTime = 0;
-		setTimelineValue();
-		setTimeText(1);
+		updateTimelineValue();
+		updateTimeText(1);
+
+		if (repeatState != 1 && currentTrackIndex > 0 && (tempTime < 1 || skipDirectlyToPreviousTrack))
+		{
+			currentTrackIndex--;
+			playAudioFile(playlist[currentTrackIndex]);
+			if (skipDirectlyToPreviousTrack) forceStartPaused = true;
+			playlistTracksContainer.children[currentTrackIndex].classList.add('playlist-track-unplayed');
+			playlistTracksContainer.children[currentTrackIndex].classList.remove('playlist-track-played');
+			playlistTracksContainer.children[currentTrackIndex + 1].classList.add('playlist-track-unplayed');
+			playlistTracksContainer.children[currentTrackIndex + 1].classList.remove('playlist-track-played');
+		}
+		else if (repeatState == 1) playAudioFile(playlist[currentTrackIndex]);
+		else if (repeatState == 2 && (tempTime < 1 || skipDirectlyToPreviousTrack)) skipToTrack(playlistTracksContainer.children[playlistTracksContainer.children.length - 1]);
 	}
 }
 
@@ -408,25 +462,59 @@ function skipForward()
 			pause(true);
 		}
 
-		setTimelineValue();
-		setTimeText(1);
+		updateTimelineValue();
+		updateTimeText(1);
 
-		if (playlist.length > 1)
+		if (repeatState != 1 && playlist.length - currentTrackIndex - 1 > 0)
 		{
-			if (isShuffleEnabled) doShuffle(playlist);
-			playAudioFile(playlist[1]);
-			removeAudioFileFromPlaylist(0);
+			currentTrackIndex++;
+			if (isShuffleEnabled && playlist.length - 1 - currentTrackIndex > 1) doShuffle(playlist);
+			playAudioFile(playlist[currentTrackIndex]);
+			playlistTracksContainer.children[currentTrackIndex].classList.add('playlist-track-unplayed');
+			playlistTracksContainer.children[currentTrackIndex].classList.remove('playlist-track-played');
+			playlistTracksContainer.children[currentTrackIndex - 1].classList.remove('playlist-track-unplayed');
+			playlistTracksContainer.children[currentTrackIndex - 1].classList.add('playlist-track-played');
 		}
+		else if (repeatState == 1) playAudioFile(playlist[currentTrackIndex]);
+		else if (repeatState == 2) skipToTrack(playlistTracksContainer.children[0]);
 	}
+}
+
+function skipToTrack(trackElement)
+{
+	if (trackElement.classList.contains('playlist-track-name-container')) trackElement = trackElement.parentElement;
+	else if (trackElement.classList.contains('playlist-track-name')) trackElement = trackElement.parentElement.parentElement;
+
+	const trackElementIndex = Array.from(trackElement.parentElement.children).indexOf(trackElement);
+	if (trackElementIndex == currentTrackIndex) return;
+
+	for (; trackElementIndex > currentTrackIndex; currentTrackIndex++)
+	{
+		playlistTracksContainer.children[currentTrackIndex].classList.remove('playlist-track-unplayed');
+		playlistTracksContainer.children[currentTrackIndex].classList.add('playlist-track-played');
+	}
+
+	for (; trackElementIndex < currentTrackIndex; currentTrackIndex--)
+	{
+		playlistTracksContainer.children[currentTrackIndex].classList.add('playlist-track-unplayed');
+		playlistTracksContainer.children[currentTrackIndex].classList.remove('playlist-track-played');
+	}
+
+	playlistTracksContainer.children[currentTrackIndex].classList.add('playlist-track-unplayed');
+	playlistTracksContainer.children[currentTrackIndex].classList.remove('playlist-track-played');
+
+	playAudioFile(playlist[currentTrackIndex]);
+	updateTimelineValue();
+	updateTimeText(1);
 }
 
 function doShuffle()
 {
-	const nextTrackIndex = randomIntFromInterval(1, playlist.length - 1);
-	const temp = playlist[1];
-	playlist[1] = playlist[nextTrackIndex];
+	const nextTrackIndex = randomIntFromInterval(currentTrackIndex, playlist.length - 1);
+	const temp = playlist[currentTrackIndex];
+	playlist[currentTrackIndex] = playlist[nextTrackIndex];
 	playlist[nextTrackIndex] = temp;
-	playlistTracksContainer.insertBefore(playlistTracksContainer.children[nextTrackIndex], playlistTracksContainer.children[1]);
+	playlistTracksContainer.insertBefore(playlistTracksContainer.children[nextTrackIndex], playlistTracksContainer.children[currentTrackIndex]);
 }
 
 function setTrackNameText(filePath)
@@ -461,7 +549,7 @@ function getTrackNameTextFromFilePath(filePath)
 }
 
 //set one of time texts' content
-function setTimeText(index)
+function updateTimeText(index)
 {
 	const time = index == 1 ? musicPlayer.currentTime : musicPlayer.duration;
 
@@ -537,12 +625,12 @@ function changeEQ(inputIndex, isManualInput = true)
 async function resetEQ()
 {
 	await ask("You're about to reset your EQ settings. This action cannot be reverted.\nAre you sure?",
-		{ type: 'warning', cancelLabel: 'Wait, no', okLabel: 'Yes, just do it' }).then((isContinue) =>
+		{ type: 'warning', cancelLabel: 'Wait, no', okLabel: 'Yes, just do it' }).then(async (isContinue) =>
 	{
 		if (!isContinue) return;
 		settings.resetEQ();
 		for (var i = 0; i < equalizerInputs.length; i++) changeEQ(i, false);
-		saveSettingsToFile();
+		await saveSettingsToFile();
 	});
 }
 
