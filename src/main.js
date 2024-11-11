@@ -43,7 +43,6 @@ var canTransitionBetweenPages = true;
 var trackNameScrollTimeoutId;
 var isPlayAfterTimelineValueChange = false;
 var isTimelineValueInput = false;
-var timelineValueInputTimeoutId;
 var isShuffleEnabled = false;
 var repeatState = 0;
 var forceStartPaused = false;
@@ -165,23 +164,24 @@ document.addEventListener('DOMContentLoaded', async () =>
 	{
 		if (!isMusicSourceNull())
 		{
+			isTimelineValueInput = true;
 			musicPlayer.currentTime = e.target.value;
 			setTimelineHandlePosition();
 			updateTimeText(1);
 			if (!musicPlayer.paused) isPlayAfterTimelineValueChange = true;
 			musicPlayer.pause();
-
-			isTimelineValueInput = true;
-			clearTimeout(timelineValueInputTimeoutId);
-			timelineValueInputTimeoutId = setTimeout(() => { isTimelineValueInput = false; }, 100);
 		}
 	});
 
 	trackTimelineFront.addEventListener('change', () =>
 	{
+		isTimelineValueInput = false;
+
 		if (isPlayAfterTimelineValueChange)
 		{
 			isPlayAfterTimelineValueChange = false;
+			if (Number(musicPlayer.currentTime.toFixed(0)) === Number(musicPlayer.duration.toFixed(0)))
+				musicPlayer.currentTime = musicPlayer.duration - 0.01;
 			musicPlayer.play();
 		}
 	});
@@ -216,7 +216,9 @@ function initializeAccentColorButtons()
 {
 	for (var i = 0; i < accentColorButtons.length; i++)
 	{
-		accentColorButtons[i].style.background = `hsl(${18 * i}, 100%, 61%)`;
+		if (i < accentColorButtons.length - 2) accentColorButtons[i].style.background = `hsl(${18 * i}, 100%, 61%)`;
+		else if (i == accentColorButtons.length - 1) accentColorButtons[i].style.background = 'hsl(0, 0%, 0%)';
+		else if (i == accentColorButtons.length - 2) accentColorButtons[i].style.background = 'hsl(0, 0%, 100%)';
 
 		accentColorButtons[i].addEventListener('click', (event) =>
 		{
@@ -603,12 +605,15 @@ function getCurrentPageIndex()
 
 function changeAccentColor()
 {
-	document.documentElement.style.setProperty('--clr-accent', `hsl(${18 * (settings.accentColor - 1)}, 100%, 61%)`);
+	if (settings.accentColor - 1 < accentColorButtons.length - 2) document.documentElement.style.setProperty('--clr-accent', `hsl(${18 * (settings.accentColor - 1)}, 100%, 61%)`);
+	else if (settings.accentColor - 1 == accentColorButtons.length - 1) document.documentElement.style.setProperty('--clr-accent', 'hsl(0, 0%, 10%)');
+	else if (settings.accentColor - 1 == accentColorButtons.length - 2) document.documentElement.style.setProperty('--clr-accent', 'hsl(0, 0%, 61%)');
 
 	for (var i = 0; i < accentColorButtons.length; i++)
 	{
 		accentColorButtons[i].style.removeProperty('outline');
-		if (i == settings.accentColor - 1) accentColorButtons[i].style.outline = '2px solid white';
+		if (i == settings.accentColor - 1)
+			accentColorButtons[i].style.outline = `2px solid var(--clr-white-transparent-${i == accentColorButtons.length - 2 ? '50' : '85'})`;
 	}
 }
 
