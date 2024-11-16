@@ -31,8 +31,11 @@ const enableShuffleByDefaultCheckbox = document.getElementById('enableShuffleByD
 const equalizerInputs = document.querySelectorAll('.equalizer-bar-front');
 const equalizerBarHandles = document.querySelectorAll('.equalizer-bar-handle-visual');
 const playlistTracksContainer = document.getElementById('playlistTracksContainer');
-const shuffleBtn = document.getElementById('shuffleBtn')
-const repeatBtn = document.getElementById('repeatBtn')
+const shuffleBtn = document.getElementById('shuffleBtn');
+const repeatBtn = document.getElementById('repeatBtn');
+const volumeSliderImg = document.getElementById('volumeSlider').children[0];
+const volumeSliderFront = document.querySelector('.volume-bar-front');
+const volumeSliderHandle = document.querySelector('.volume-bar-handle-visual');
 
 var playlist = [];
 var currentTrackIndex = 0;
@@ -53,6 +56,7 @@ class Settings
 	eq;
 	clearPlaylistOnNewFile = true;
 	enableShuffleByDefault = false;
+	volume = 1;
 
 	constructor() { this.resetEQ(); }
 	resetEQ() { this.eq = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]; }
@@ -136,6 +140,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 	initializeEQ();
 	initializeClearPlaylistOnNewFileCheckbox();
 	initializeEnableShuffleByDefaultCheckbox();
+	initializeVolume();
 	await loadSettingsFromFile();
 
 	const backBtns = document.querySelectorAll('.backBtn');
@@ -267,6 +272,16 @@ function initializeEnableShuffleByDefaultCheckbox()
 	{
 		settings.enableShuffleByDefault = !settings.enableShuffleByDefault;
 		changeEnableShuffleByDefault();
+		saveSettingsToFile();
+	});
+}
+
+function initializeVolume()
+{
+	volumeSliderFront.addEventListener('input', (event) =>
+	{
+		settings.volume = -event.target.value; //invert cuz sliders are actually upside down
+		changeVolume();
 		saveSettingsToFile();
 	});
 }
@@ -642,6 +657,19 @@ async function resetEQ()
 function changeClearPlaylistOnNewFile() { clearPlaylistOnNewFileCheckbox.checked = settings.clearPlaylistOnNewFile; }
 function changeEnableShuffleByDefault() { enableShuffleByDefaultCheckbox.checked = settings.enableShuffleByDefault; }
 
+function changeVolume(isManualInput = true)
+{
+	musicPlayer.volume = 1 + settings.volume;
+	if (!isManualInput) volumeSliderFront.value = -settings.volume; //invert cuz sliders are actually upside down
+	const handlePosition = Number(remap(volumeSliderFront.value, volumeSliderFront.min, volumeSliderFront.max, 0, 82).toFixed(1));
+	volumeSliderHandle.style.top = `${handlePosition}px`;
+
+	const volumeAbs = 1 - Math.abs(settings.volume);
+	if (volumeAbs == 0) volumeSliderImg.src = './assets/volume-muted.png';
+	else if (volumeAbs < 0.5) volumeSliderImg.src = './assets/volume-low.png';
+	else if (volumeAbs >= 0.5) volumeSliderImg.src = './assets/volume-high.png';
+}
+
 async function loadSettingsFromFile()
 {
 	const appConfigDirPath = await appConfigDir();
@@ -660,6 +688,7 @@ async function loadSettingsFromFile()
 	for (var i = 0; i < equalizerInputs.length; i++) changeEQ(i, false);
 	changeClearPlaylistOnNewFile();
 	changeEnableShuffleByDefault();
+	changeVolume(false);
 }
 
 async function saveSettingsToFile() { if (settingsFilePath != '') await writeTextFile(settingsFilePath, JSON.stringify(settings)); }

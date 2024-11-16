@@ -45,18 +45,29 @@
 			<button class="btn btn-square track-controls-pause" id="playPauseBtn"><img src="./assets/play.png"></button>
 			<button class="btn btn-square track-controls-skip-forward" id="skipForwardBtn"><img src="./assets/skipforward.png"></button>
 			<button class="btn btn-square" id="repeatBtn"><img src="./assets/repeat.png"><div></div><img src="./assets/repeat-1.png"></button>
+			
+			<div id="volumeSlider">
+				<img src="./assets/volume.png">
+
+				<div class="slider-bar">
+					<span class="slider-bar-back"></span>
+					<input class="slider-bar-front volume-bar-front" type="range" min="0" max="1" step="0.01" value="0"/>
+					<span class="slider-bar-handle-visual volume-bar-handle-visual"></span>
+				</div>
+
+			</div>
 		</div>
 
-		<div class="track-timeline">
+		<div class="slider-bar track-timeline">
 
 			<div class="time-texts">
 				<p id="time-text-1">0:00</p>
 				<p id="time-text-2">0:00</p>
 			</div>
 
-			<span class="track-timeline-back"></span>
-			<input type="range" min="0" max="120" step="0.01" value="0" class="track-timeline-front"/>
-			<span class="track-timeline-handle-visual"></span>
+			<span class="slider-bar-back track-timeline-back"></span>
+			<input class="slider-bar-front track-timeline-front" type="range" min="0" max="120" step="0.01" value="0"/>
+			<span class="slider-bar-handle-visual track-timeline-handle-visual"></span>
 
 		</div>
 
@@ -147,64 +158,64 @@
 
 		<div class="equalizer-bars">
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
-			<div class="equalizer-bar">
-				<span class="equalizer-bar-back"></span>
-				<input class="equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
-				<span class="equalizer-bar-handle-visual"></span>
+			<div class="slider-bar">
+				<span class="slider-bar-back"></span>
+				<input class="slider-bar-front equalizer-bar-front" type="range" min="-5" max="5" step="0.1" value="0"/>
+				<span class="slider-bar-handle-visual equalizer-bar-handle-visual"></span>
 			</div>
 
 		</div>
