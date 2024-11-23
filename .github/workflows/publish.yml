@@ -2,8 +2,10 @@ name: 'publish'
 
 on:
   push:
-    tags:
-      - '**'
+    branches:
+      - 'main/**'
+    paths:
+      - 'version.txt'
 
 jobs:
   publish-tauri:
