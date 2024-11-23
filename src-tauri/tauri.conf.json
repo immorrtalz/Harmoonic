@@ -81,6 +81,19 @@
 			{
 				"bundleMediaFramework": true
 			}
+		},
+		"updater":
+		{
+			"active": true,
+			"endpoints": [
+				"https://github.com/immorrtalz/Harmoonic/releases/tag/1.0"
+			],
+			"dialog": true,
+			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEY2MzE2NUJBRUFGNDBFRTAKUldUZ0R2VHF1bVV4OWkvNWNOOFp6Z1JJbEx1emhVSzF6K0hSK3pHcENKWUZqR2dCQmo3c2N1SnkK",
+			"windows":
+			{
+				"installMode": "basicUi"
+			}
 		}
 	}
 }

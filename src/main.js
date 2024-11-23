@@ -8,6 +8,7 @@ const { exists, createDir, readTextFile, writeTextFile } = window.__TAURI__.fs;
 const { message, ask, open } = window.__TAURI__.dialog;
 const { listen } = window.__TAURI__.event;
 const { getVersion } = window.__TAURI__.app;
+const { checkUpdate } = window.__TAURI__.updater;
 const shell_open = window.__TAURI__.shell.open;
 
 const isDev = true;
@@ -28,6 +29,7 @@ const musicPlayer = document.querySelector('#music');
 const accentColorButtons = document.querySelectorAll('.settings-param-color');
 const clearPlaylistOnNewFileCheckbox = document.getElementById('clearPlaylistOnNewFileCheckbox');
 const enableShuffleByDefaultCheckbox = document.getElementById('enableShuffleByDefaultCheckbox');
+const rememberWindowPositionCheckbox = document.getElementById('rememberWindowPositionCheckbox');
 const equalizerInputs = document.querySelectorAll('.equalizer-bar-front');
 const equalizerBarHandles = document.querySelectorAll('.equalizer-bar-handle-visual');
 const playlistTracksContainer = document.getElementById('playlistTracksContainer');
@@ -42,6 +44,7 @@ var currentTrackIndex = 0;
 var EQContext = new AudioContext();
 const EQFrequencies = [30, 125, 250, 500, 1000, 2000, 4000, 8000, 12000, 16000];
 const EQFilters = EQFrequencies.map(createEQFilter);
+var settingsLoaded = false;
 var canTransitionBetweenPages = true;
 var trackNameScrollTimeoutId;
 var isPlayAfterTimelineValueChange = false;
@@ -56,6 +59,8 @@ class Settings
 	eq;
 	clearPlaylistOnNewFile = true;
 	enableShuffleByDefault = false;
+	rememberWindowPosition = false;
+	rememberedWindowPosition = [0, 0, 0, 0]; // x, y, screenWidth, screenHeight
 	volume = 1;
 
 	constructor() { this.resetEQ(); }
@@ -71,63 +76,93 @@ musicPlayer.crossOrigin = 'anonymous';
 //app entry point (sort of)
 currentMonitor().then(async (currentMonitorResult) =>
 {
-	//set window position to center-bottom while it is invisible
-	const windowSize = await appWindow.outerSize();
-	const newWindowPositionX = (currentMonitorResult.size.width - windowSize.width) * 0.5;
-	const newWindowPositionY = currentMonitorResult.size.height - windowSize.height - 47 - 16;
-	appWindow.setPosition(new PhysicalPosition(newWindowPositionX, newWindowPositionY));
-	await appWindow.show();
-
-	//make window use acrylic background if it is supported on a current OS version (win11 build >=22621)
-	const platformResult = await platform()
-	if (platformResult !== 'win32') return;
-	const OSVersion = await version();
-	const sysVer = OSVersion.split('.');
-
-	if (parseInt(sysVer[2], 10) >= 22621)
+	await loadSettingsFromFile().then(async () =>
 	{
-		invoke('winacrylic', appWindow);
-		await appWindow.onFocusChanged(({ payload: isFocused }) =>
+		//set window position to center-bottom while it is invisible
+		const windowSize = await appWindow.outerSize();
+		var newWindowPositionX = (currentMonitorResult.size.width - windowSize.width) * 0.5;
+		var newWindowPositionY = currentMonitorResult.size.height - windowSize.height - 47 - 16;
+
+		if (settings.rememberWindowPosition)
 		{
-			mainGradient.style.opacity = isFocused ? '0.5' : '0.85';
-			noise.style.opacity = isFocused ? '0.3' : '0.5';
-		});
-	}
-	else mainGradient.style.opacity = '1';
-
-	const matches = await getMatches().catch(() => { exit(0); });
-	const filePath = matches.args.filePath.value;
-
-	if (!isDev) await validateFilePath(filePath);
-	addAudioFileToPlaylist(filePath);
-	playAudioFile(playlist[currentTrackIndex]);
-
-	await listen('single-instance', async (event) =>
-	{
-		const eventFilePath = event.payload.args[1];
-
-		if (isFilePathOK(eventFilePath))
-		{
-			if (settings.clearPlaylistOnNewFile) clearPlaylist();
-			addAudioFileToPlaylist(eventFilePath);
-
-			if (settings.clearPlaylistOnNewFile)
+			if (settings.rememberedWindowPosition[2] == 0 || settings.rememberedWindowPosition[3] == 0
+				|| settings.rememberedWindowPosition[2] != currentMonitorResult.size.width || settings.rememberedWindowPosition[3] != currentMonitorResult.size.height)
 			{
-				playAudioFile(playlist[currentTrackIndex]);
-				await appWindow.unminimize();
-				await appWindow.setFocus();
+				settings.rememberedWindowPosition[0] = newWindowPositionX;
+				settings.rememberedWindowPosition[1] = newWindowPositionY;
+				settings.rememberedWindowPosition[2] = currentMonitorResult.size.width;
+				settings.rememberedWindowPosition[3] = currentMonitorResult.size.height;
+			}
+			else
+			{
+				newWindowPositionX = settings.rememberedWindowPosition[0];
+				newWindowPositionY = settings.rememberedWindowPosition[1];
 			}
 		}
-	});
 
-	await listen('tauri://file-drop', async (event) =>
-	{
-		const eventFilePaths = event.payload;
+		appWindow.setPosition(new PhysicalPosition(newWindowPositionX, newWindowPositionY));
+		await appWindow.show();
 
-		for (var i = 0; i < eventFilePaths.length; i++)
+		//make window use acrylic background if it is supported on a current OS version (win11 build >=22621)
+		const platformResult = await platform()
+		if (platformResult !== 'win32') return;
+		const OSVersion = await version();
+		const sysVer = OSVersion.split('.');
+
+		if (parseInt(sysVer[2], 10) >= 22621)
 		{
-			if (isFilePathOK(eventFilePaths[i])) addAudioFileToPlaylist(eventFilePaths[i]);
+			invoke('winacrylic', appWindow);
+			await appWindow.onFocusChanged(({ payload: isFocused }) =>
+			{
+				mainGradient.style.opacity = isFocused ? '0.5' : '0.85';
+				noise.style.opacity = isFocused ? '0.3' : '0.5';
+			});
 		}
+		else mainGradient.style.opacity = '1';
+
+		const matches = await getMatches().catch(() => { exit(0); });
+		const filePath = matches.args.filePath.value;
+
+		if (!isDev) await validateFilePath(filePath);
+		addAudioFileToPlaylist(filePath);
+		playAudioFile(playlist[currentTrackIndex]);
+
+		await listen('single-instance', async (event) =>
+		{
+			const eventFilePath = event.payload.args[1];
+
+			if (isFilePathOK(eventFilePath))
+			{
+				if (settings.clearPlaylistOnNewFile) clearPlaylist();
+				addAudioFileToPlaylist(eventFilePath);
+
+				if (settings.clearPlaylistOnNewFile)
+				{
+					playAudioFile(playlist[currentTrackIndex]);
+					await appWindow.unminimize();
+					await appWindow.setFocus();
+				}
+			}
+		});
+
+		await listen('tauri://file-drop', async (event) =>
+		{
+			const eventFilePaths = event.payload;
+
+			for (var i = 0; i < eventFilePaths.length; i++)
+			{
+				if (isFilePathOK(eventFilePaths[i])) addAudioFileToPlaylist(eventFilePaths[i]);
+			}
+		});
+
+		await listen('tauri://move', async () =>
+		{
+			if (settings.rememberWindowPosition)
+			{
+				await setRememberedWindowPosition();
+				await saveSettingsToFile();
+			}
+		});
 	});
 });
 
@@ -135,13 +170,23 @@ currentMonitor().then(async (currentMonitorResult) =>
 document.addEventListener('DOMContentLoaded', async () =>
 {
 	document.addEventListener('contextmenu', (event) => event.preventDefault());
+	document.addEventListener('keydown', (event) => { if (event.key !== 'F12') event.preventDefault(); });
 
 	initializeAccentColorButtons();
 	initializeEQ();
 	initializeClearPlaylistOnNewFileCheckbox();
 	initializeEnableShuffleByDefaultCheckbox();
+	initializeRememberWindowPositionCheckbox();
 	initializeVolume();
-	await loadSettingsFromFile();
+
+	const temp_settingsLoadedIntervalId = setInterval(async () =>
+	{
+		if (settingsLoaded)
+		{
+			await applyAllSettings();
+			clearInterval(temp_settingsLoadedIntervalId);
+		}
+	}, 100);
 
 	const backBtns = document.querySelectorAll('.backBtn');
 	for (var i = 0; i < backBtns.length; i++) backBtns[i].addEventListener('click', () => { openPage(0); });
@@ -161,6 +206,9 @@ document.addEventListener('DOMContentLoaded', async () =>
 	document.getElementById('latestVersionLinkBtn').addEventListener('click', async () => { await shell_open('https://github.com/immorrtalz/Harmoonic/releases/latest'); });
 	document.getElementById('gitHubLinkBtn').addEventListener('click', async () => { await shell_open('https://github.com/immorrtalz/Harmoonic'); });
 	document.getElementById('devSiteLinkBtn').addEventListener('click', async () => { await shell_open('https://evermedia-project.ru'); });
+
+	volumeSliderFront.parentElement.parentElement.addEventListener('mouseenter', () => { trackNameContainer.style.width = trackNameContainer.offsetWidth * 0.885 + 'px'; });
+	volumeSliderFront.parentElement.parentElement.addEventListener('mouseleave', () => { trackNameContainer.style.width = ''; });
 
 	if (settings.enableShuffleByDefault) switchShuffle();
 	document.getElementById('currentVersionText').textContent += await getVersion();
@@ -274,6 +322,34 @@ function initializeEnableShuffleByDefaultCheckbox()
 		changeEnableShuffleByDefault();
 		saveSettingsToFile();
 	});
+}
+
+function initializeRememberWindowPositionCheckbox()
+{
+	rememberWindowPositionCheckbox.addEventListener('click', async () =>
+	{
+		settings.rememberWindowPosition = !settings.rememberWindowPosition;
+		changeRememberWindowPosition();
+
+		if (settings.rememberWindowPosition) await setRememberedWindowPosition();
+		else
+		{
+			for (var i = 0; i < settings.rememberedWindowPosition.length; i++) settings.rememberedWindowPosition[i] = 0;
+		}
+
+		await saveSettingsToFile();
+	});
+}
+
+async function setRememberedWindowPosition()
+{
+	const windowPosition = await appWindow.outerPosition();
+	const currentMonitorResult = await currentMonitor();
+
+	settings.rememberedWindowPosition[0] = windowPosition.x;
+	settings.rememberedWindowPosition[1] = windowPosition.y;
+	settings.rememberedWindowPosition[2] = currentMonitorResult.size.width;
+	settings.rememberedWindowPosition[3] = currentMonitorResult.size.height;
 }
 
 function initializeVolume()
@@ -656,6 +732,7 @@ async function resetEQ()
 
 function changeClearPlaylistOnNewFile() { clearPlaylistOnNewFileCheckbox.checked = settings.clearPlaylistOnNewFile; }
 function changeEnableShuffleByDefault() { enableShuffleByDefaultCheckbox.checked = settings.enableShuffleByDefault; }
+function changeRememberWindowPosition() { rememberWindowPositionCheckbox.checked = settings.rememberWindowPosition; }
 
 function changeVolume(isManualInput = true)
 {
@@ -683,11 +760,16 @@ async function loadSettingsFromFile()
 		await writeTextFile(settingsFilePath, JSON.stringify(settings));
 	}
 
-	//apply loaded settings
+	settingsLoaded = true;
+}
+
+async function applyAllSettings()
+{
 	changeAccentColor();
 	for (var i = 0; i < equalizerInputs.length; i++) changeEQ(i, false);
 	changeClearPlaylistOnNewFile();
 	changeEnableShuffleByDefault();
+	changeRememberWindowPosition();
 	changeVolume(false);
 }
 

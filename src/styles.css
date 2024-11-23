@@ -343,7 +343,8 @@ body
 	height: 1.5rem;
 	margin: 0.5rem 0 0.5rem -1rem;
 	padding: 0;
-	mask-image: linear-gradient(to right, transparent, white 5%, white 95%, transparent);
+	mask-image: linear-gradient(to right, transparent, white 1rem, white calc(100% - 1rem), transparent);
+	transition: all 0.2s cubic-bezier(0.83, 0, 0.17, 1), width 0.3s;
 	overflow: visible;
 }
 
