@@ -11,7 +11,7 @@ const { getVersion } = window.__TAURI__.app;
 const { checkUpdate } = window.__TAURI__.updater;
 const shell_open = window.__TAURI__.shell.open;
 
-const isDev = true;
+const isDev = false;
 const supportedExtensions = [ 'mp3', 'wav', 'weba', 'webm', 'm4a', 'ogg', 'oga', 'caf', 'flac', 'opus', 'mid', 'aiff', 'wma', 'au' ];
 
 const mainGradient = document.querySelector('.main-gradient');
