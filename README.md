@@ -28,10 +28,10 @@ Open source, lightweight, fast and Windows only
 > [v0.4.1](https://github.com/immorrtalz/Harmoonic/releases/tag/0.4.1) is functionally equivalent to [v0.4.0](https://github.com/immorrtalz/Harmoonic/releases/tag/0.4.0), but it lacks the [taskbar thumbnail toolbar](https://learn.microsoft.com/en-us/windows/win32/shell/taskbar-extensions#thumbnail-toolbars) as it is not implemented in [Tauri](https://github.com/tauri-apps/tauri).
 > I've already submitted a [feature request](https://github.com/tauri-apps/tauri/issues/10141), so all we can do is wait and hope that they will implement it at all.
 
-![harmoonic-screenshot-1](https://github.com/user-attachments/assets/2d6049d7-6696-435a-918f-2a77d97bb7cf)
-![harmoonic-screenshot-2](https://github.com/user-attachments/assets/96534686-1784-4084-9df4-5bb25648470f)
-![harmoonic-screenshot-3](https://github.com/user-attachments/assets/9960e4b3-221c-42e5-9960-4fbddadac3b6)
-![harmoonic-screenshot-4](https://github.com/user-attachments/assets/1fd7ede7-cd35-4dd6-8624-d2f776aef45c)
+![harmoonic-screenshot-1](https://github.com/user-attachments/assets/3bbbd4a1-224f-405c-8cc7-d53ceba85a91)
+![harmoonic-screenshot-2](https://github.com/user-attachments/assets/1ed9b41b-b0b9-4487-a9cc-f6ba82fb8381)
+![harmoonic-screenshot-3](https://github.com/user-attachments/assets/24d9d951-6a80-4093-b837-decd64e8c7db)
+![harmoonic-screenshot-4](https://github.com/user-attachments/assets/96e8f358-2b8c-49fe-94cc-45bd0f24577f)
 
 ---
 
