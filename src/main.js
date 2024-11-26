@@ -27,7 +27,7 @@ const trackTimelineFront = document.querySelector('.track-timeline-front');
 const timelineHandle = document.querySelector('.track-timeline-handle-visual');
 const musicPlayer = document.querySelector('#music');
 const accentColorButtons = document.querySelectorAll('.settings-param-color');
-const clearPlaylistOnNewFileCheckbox = document.getElementById('clearPlaylistOnNewFileCheckbox');
+const startPlayingOnNewFileCheckbox = document.getElementById('startPlayingOnNewFileCheckbox');
 const enableShuffleByDefaultCheckbox = document.getElementById('enableShuffleByDefaultCheckbox');
 const rememberWindowPositionCheckbox = document.getElementById('rememberWindowPositionCheckbox');
 const equalizerInputs = document.querySelectorAll('.equalizer-bar-front');
@@ -57,7 +57,7 @@ class Settings
 {
 	accentColor = 16;
 	eq;
-	clearPlaylistOnNewFile = true;
+	startPlayingOnNewFile = true;
 	enableShuffleByDefault = false;
 	rememberWindowPosition = false;
 	rememberedWindowPosition = [0, 0, 0, 0]; // x, y, screenWidth, screenHeight
@@ -133,12 +133,11 @@ currentMonitor().then(async (currentMonitorResult) =>
 
 			if (isFilePathOK(eventFilePath))
 			{
-				if (settings.clearPlaylistOnNewFile) clearPlaylist();
 				addAudioFileToPlaylist(eventFilePath);
 
-				if (settings.clearPlaylistOnNewFile)
+				if (settings.startPlayingOnNewFile)
 				{
-					playAudioFile(playlist[currentTrackIndex]);
+					if (currentTrackIndex == playlistTracksContainer.children.length - 2) skipForward();
 					await appWindow.unminimize();
 					await appWindow.setFocus();
 				}
@@ -174,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 
 	initializeAccentColorButtons();
 	initializeEQ();
-	initializeClearPlaylistOnNewFileCheckbox();
+	initializeStartPlayingOnNewFileCheckbox();
 	initializeEnableShuffleByDefaultCheckbox();
 	initializeRememberWindowPositionCheckbox();
 	initializeVolume();
@@ -202,6 +201,7 @@ document.addEventListener('DOMContentLoaded', async () =>
 	document.getElementById('playPauseBtn').addEventListener('click', () => { playPause(); });
 	document.getElementById('skipForwardBtn').addEventListener('click', () => { skipForward(); });
 	document.getElementById('resetEQBtn').addEventListener('click', () => { resetEQ(); });
+	document.getElementById('clearPlaylistBtn').addEventListener('click', () => { clearPlaylist(); });
 	document.getElementById('addAudioFileToPlaylistBtn').addEventListener('click', () => { addAudioFilesToPlaylistViaOpenFile(); });
 	document.getElementById('latestVersionLinkBtn').addEventListener('click', async () => { await shell_open('https://github.com/immorrtalz/Harmoonic/releases/latest'); });
 	document.getElementById('gitHubLinkBtn').addEventListener('click', async () => { await shell_open('https://github.com/immorrtalz/Harmoonic'); });
@@ -304,12 +304,12 @@ function initializeEQ()
 	}
 }
 
-function initializeClearPlaylistOnNewFileCheckbox()
+function initializeStartPlayingOnNewFileCheckbox()
 {
-	clearPlaylistOnNewFileCheckbox.addEventListener('click', () =>
+	startPlayingOnNewFileCheckbox.addEventListener('click', () =>
 	{
-		settings.clearPlaylistOnNewFile = !settings.clearPlaylistOnNewFile;
-		changeClearPlaylistOnNewFile();
+		settings.startPlayingOnNewFile = !settings.startPlayingOnNewFile;
+		changeStartPlayingOnNewFile();
 		saveSettingsToFile();
 	});
 }
@@ -378,13 +378,7 @@ function playAudioFile(filePath)
 {
 	musicPlayer.src = convertFileSrc(filePath);
 	setTrackNameText(filePath);
-}
-
-function clearPlaylist()
-{
-	playlist = [];
-	currentTrackIndex = 0;
-	playlistTracksContainer.innerHTML = "";
+	playlistTracksContainer.children[currentTrackIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function addAudioFileToPlaylist(filePath)
@@ -730,7 +724,33 @@ async function resetEQ()
 	});
 }
 
-function changeClearPlaylistOnNewFile() { clearPlaylistOnNewFileCheckbox.checked = settings.clearPlaylistOnNewFile; }
+async function clearPlaylist()
+{
+	await ask("You're about to clear your current playlist. This action cannot be reverted.\nAre you sure?",
+		{ type: 'warning', cancelLabel: 'Wait, no', okLabel: 'Yes, just do it' }).then(async (isContinue) =>
+	{
+		if (!isContinue) return;
+		const temp = playlist[currentTrackIndex];
+		playlist = [];
+		playlist.push(temp);
+
+		var i = 0;
+
+		while (playlistTracksContainer.children.length > 1)
+		{
+			if (i == currentTrackIndex) i++;
+			else
+			{
+				playlistTracksContainer.children[i].remove();
+				currentTrackIndex--;
+			}
+		}
+
+		currentTrackIndex = 0;
+	});
+}
+
+function changeStartPlayingOnNewFile() { startPlayingOnNewFileCheckbox.checked = settings.startPlayingOnNewFile; }
 function changeEnableShuffleByDefault() { enableShuffleByDefaultCheckbox.checked = settings.enableShuffleByDefault; }
 function changeRememberWindowPosition() { rememberWindowPositionCheckbox.checked = settings.rememberWindowPosition; }
 
@@ -767,7 +787,7 @@ async function applyAllSettings()
 {
 	changeAccentColor();
 	for (var i = 0; i < equalizerInputs.length; i++) changeEQ(i, false);
-	changeClearPlaylistOnNewFile();
+	changeStartPlayingOnNewFile();
 	changeEnableShuffleByDefault();
 	changeRememberWindowPosition();
 	changeVolume(false);

@@ -136,8 +136,6 @@ body
 .btn:active * { opacity: 0.5; }
 /* BUTTONS END */
 
-.page-header-right-aligned-btn { margin-left: auto; }
-
 /* CHECKBOX */
 .checkbox
 {
@@ -401,6 +399,7 @@ body
 	line-height: 1.1rem;
 	font-weight: 700;
 	color: var(--clr-white-transparent-85);
+	flex-grow: 1;
 }
 
 .page-main { z-index: 0; }
@@ -644,7 +643,7 @@ body
 	outline: 1px solid var(--clr-white-transparent-10);
 }
 
-:nth-last-child(1 of .playlist-track-played) .playlist-track-move-arrows img { display: none; }
+:nth-last-child(1 of .playlist-track-played) .playlist-track-move-arrows img:nth-child(2) { display: none; }
 .playlist-track-played .playlist-track-name { opacity: 0.5; }
 
 :nth-child(1 of .playlist-track-unplayed)
