@@ -1,5 +1,5 @@
 {
-	"$schema": "https://schema.tauri.app/config/2.0.0",
+	"$schema": "https://schema.tauri.app/config/2",
 	"productName": "Harmoonic",
 	"version": "1.0.1",
 	"identifier": "com.EVERMEDIAPROJECT.Harmoonic",
@@ -13,9 +13,10 @@
 		"withGlobalTauri": true,
 		"windows": [
 			{
+				"title": "Harmoonic",
 				"label": "main",
-				"width": 432,
-				"height": 960,
+				"width": 460,
+				"height": 1000,
 				"fullscreen": false,
 				"x": 0,
 				"y": 0,
@@ -37,10 +38,10 @@
 		"targets": "all",
 		"publisher": "EVERMEDIA PROJECT",
 		"icon": [
-			"./icons/icon.png",
-			"./icons/icon.ico"
+			"icons/icon.ico",
+			"icons/icon.png"
 		],
-		"copyright": "© 2024 EVERMEDIA PROJECT",
+		"copyright": "© 2025 EVERMEDIA PROJECT",
 		"category": "Music",
 		"fileAssociations":
 		[

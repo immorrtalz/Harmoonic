@@ -1,0 +1,53 @@
+.button
+{
+	appearance: none;
+	-webkit-appearance: none;
+	outline: none;
+	border: none;
+	width: 100%;
+	height: 60px;
+	border-radius: var(--borderRadiusMain);
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+	font-size: 20px;
+
+	&:disabled
+	{
+		background: rgba(from white r g b / 0.05);
+		color: rgba(from white r g b / 0.25);
+		fill: rgba(from white r g b / 0.25);
+		pointer-events: none;
+	}
+
+	& svg
+	{
+		width: 40px;
+		height: 40px;
+	}
+}
+
+.primaryButton {}
+
+.secondaryButton
+{
+	background: rgba(from white r g b / 0.1);
+	backdrop-filter: var(--blur);
+	color: rgba(from white r g b / 0.9);
+	fill: rgba(from white r g b / 0.9);
+
+	&:active { background: rgba(from white r g b / 0.35); }
+}
+
+.withIconOnly
+{
+	width: 50px;
+	height: 50px;
+	justify-content: center;
+}
+
+.withTitleOnly { padding: 0 16px 0 16px; }
+.withIconAndTitle { padding: 0 16px 0 8px; }

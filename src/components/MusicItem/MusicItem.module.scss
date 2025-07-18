@@ -1,0 +1,110 @@
+.musicItem
+{
+	appearance: none;
+	-webkit-appearance: none;
+	outline: none;
+	border: none;
+	width: 100%;
+	height: 60px;
+	border-radius: var(--borderRadiusMain);
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: center;
+	flex-shrink: 0;
+	backdrop-filter: var(--blur);
+	color: hsl(from white h s l / 0.5);
+	fill: hsl(from white h s l / 0.35);
+
+	&:active
+	{
+		background: hsl(from white h s l / 0.25) !important;
+		color: hsl(from white h s l / 0.75);
+		fill: hsl(from white h s l / 0.65);
+	}
+
+	&:disabled
+	{
+		background: hsl(from white h s l / 0.05);
+		color: hsl(from white h s l / 0.25);
+		fill: hsl(from white h s l / 0.25);
+		pointer-events: none;
+	}
+
+	&.libraryTrack, &.playlistTrack
+	{
+		background: hsl(from white h s l / 0.02);
+		border: 1px solid hsl(from white h s l / 0.1);
+
+		&:active { border: 1px solid transparent; }
+	}
+
+	&.libraryTrack
+	{
+		gap: 16px;
+		padding: 0 16px;
+	}
+
+	&.playlistTrack, &.folder
+	{
+		gap: 4px;
+		padding: 0 16px 0 6px;
+	}
+
+	&.folder { background: hsl(from white h s l / 0.05); }
+
+	& *
+	{
+		color: inherit;
+		font-size: inherit;
+		font-weight: inherit;
+		fill: inherit;
+	}
+
+	& .order
+	{
+		width: 20px;
+		padding-top: 1.25px;
+		text-align: center;
+		font-size: 14px;
+		line-height: calc(14% * 100 / 16);
+		color: hsl(from white h s l / 0.35);
+		flex-shrink: 0;
+		text-wrap: nowrap;
+	}
+
+	& .icon
+	{
+		flex-shrink: 0;
+		width: 42px;
+		height: 42px;
+	}
+
+	& .title, & .folderInfo
+	{
+		flex-shrink: 1;
+		flex-grow: 0;
+		overflow: hidden;
+		text-wrap: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	& .folderTexts
+	{
+		display: flex;
+		flex-direction: column;
+		flex-wrap: nowrap;
+		justify-content: center;
+		flex-shrink: 1;
+		gap: 2px;
+		overflow: hidden;
+
+		& * { width: 100%; }
+	}
+
+	& .folderInfo
+	{
+		color: hsl(from white h s l / 0.35);
+		font-size: 12px;
+	}
+}

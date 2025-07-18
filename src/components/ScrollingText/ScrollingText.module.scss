@@ -1,0 +1,33 @@
+.scrollingTextContainer
+{
+	height: fit-content;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: center;
+	flex-shrink: 0;
+	color: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	gap: 64px;
+	mask-image: linear-gradient(to right, transparent, white 16px, white calc(100% - 16px), transparent);
+	overflow: hidden;
+
+	& p
+	{
+		width: fit-content;
+		height: fit-content;
+		color: inherit;
+		font-size: inherit;
+		font-weight: inherit;
+		text-wrap: nowrap;
+		flex-shrink: 0;
+		will-change: transform;
+	}
+
+	@keyframes scrollingText
+	{
+		0% { transform: translateX(0%); }
+		100% { transform: translateX(calc(-100% - 64px)); }
+	}
+}
