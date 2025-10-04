@@ -2,6 +2,7 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/immorrtalz/Harmoonic?label=latest%20release&color=limegreen)](https://github.com/immorrtalz/Harmoonic/releases/latest)
 [![Total Downloads](https://img.shields.io/github/downloads/immorrtalz/Harmoonic/total?label=total%20downloads&color=blue)](https://github.com/immorrtalz/Harmoonic/releases)
+[![Latest Release Downloads](https://img.shields.io/github/downloads/immorrtalz/Harmoonic/latest/total?label=latest%20release%20downloads&color=blue)](https://github.com/immorrtalz/Harmoonic/releases/latest)
 [![License](https://img.shields.io/badge/license-GPL%20v3-yellow?color=goldenrod)](https://github.com/immorrtalz/Harmoonic/blob/main/LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/immorrtalz/Harmoonic?color=orange)]()
 [![CodeFactor](https://www.codefactor.io/repository/github/immorrtalz/harmoonic/badge)](https://www.codefactor.io/repository/github/immorrtalz/harmoonic)
