@@ -1,4 +1,4 @@
-# <img src="https://github.com/user-attachments/assets/b5c29a3f-4346-470f-92db-5ab3a350e8cd" style="object-fit: contain; height: 24px;"/> Harmoonic
+<img src=".github/ReadmeHeader.png" alt="Harmoonic"/>
 
 [![Latest Release](https://img.shields.io/github/v/release/immorrtalz/Harmoonic?label=latest%20release&color=limegreen)](https://github.com/immorrtalz/Harmoonic/releases/latest)
 [![Total Downloads](https://img.shields.io/github/downloads/immorrtalz/Harmoonic/total?label=total%20downloads&color=blue)](https://github.com/immorrtalz/Harmoonic/releases)
