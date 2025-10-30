@@ -13,7 +13,7 @@ Simple audio player with modern design
 
 ---
 
-Open source, lightweight, fast and Windows only
+Open source, lightweight, fast and Windows and Android (soon)
 
 > [!TIP]
 > Download the latest release: https://github.com/immorrtalz/Harmoonic/releases/latest
